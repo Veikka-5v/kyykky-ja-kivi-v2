@@ -1,0 +1,1557 @@
+<!doctype html>
+<html lang="fi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#4F7A28">
+<meta name="color-scheme" content="light dark">
+<link rel="manifest" href="./manifest.webmanifest">
+<link rel="icon" href="./icon.svg">
+<link rel="apple-touch-icon" href="./icon.svg">
+<title>Treenikirja</title>
+<style>
+:root{
+  --paper:#EEF0EC; --surface:#FFFFFF; --surface-2:#F6F7F4; --line:#D9DDD4; --line-2:#C6CCC0;
+  --ink:#14181A; --ink-2:#5A625B; --ink-3:#868E85;
+  --accent:#4F7A28; --accent-ink:#3C5E1E; --accent-soft:#E3EDD6;
+  --rock:#3D6480; --rock-soft:#DEE8EF;
+  --amber:#A9701A; --amber-soft:#F5E7CE;
+  --red:#A3342A; --red-soft:#F0D9D6;
+  --shadow:0 1px 2px rgba(20,24,26,.06), 0 6px 18px -12px rgba(20,24,26,.28);
+  --r:12px; --r-s:8px;
+  color-scheme:light;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --paper:#0F1312; --surface:#171C1A; --surface-2:#1D2320; --line:#2A322D; --line-2:#3A443D;
+    --ink:#E9EDE6; --ink-2:#98A599; --ink-3:#778378;
+    --accent:#8FBF5B; --accent-ink:#A9D477; --accent-soft:#22301A;
+    --rock:#84AECA; --rock-soft:#1A2831;
+    --amber:#D9A653; --amber-soft:#302517;
+    --red:#E38375; --red-soft:#31201D;
+    --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 22px -14px rgba(0,0,0,.7);
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --paper:#0F1312; --surface:#171C1A; --surface-2:#1D2320; --line:#2A322D; --line-2:#3A443D;
+  --ink:#E9EDE6; --ink-2:#98A599; --ink-3:#778378;
+  --accent:#8FBF5B; --accent-ink:#A9D477; --accent-soft:#22301A;
+  --rock:#84AECA; --rock-soft:#1A2831;
+  --amber:#D9A653; --amber-soft:#302517;
+  --red:#E38375; --red-soft:#31201D;
+  --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 22px -14px rgba(0,0,0,.7);
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{
+  margin:0; background:var(--paper); color:var(--ink);
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+  font-size:15px; line-height:1.5;
+}
+h1,h2,h3{margin:0; text-wrap:balance; letter-spacing:-.015em; font-weight:700}
+button,input,select,textarea{font:inherit; color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:2px solid var(--accent); outline-offset:2px; border-radius:4px}
+.num{font-variant-numeric:tabular-nums; font-feature-settings:"tnum"}
+
+.wrap{max-width:900px; margin:0 auto; padding:0 14px calc(96px + env(safe-area-inset-bottom))}
+.top{
+  position:sticky; top:0; z-index:30; background:var(--paper);
+  margin:0 -14px; padding:12px 14px 9px;
+  border-bottom:1px solid var(--line); display:flex; align-items:center; gap:10px; flex-wrap:wrap;
+}
+.brand{font-size:17px; font-weight:800; letter-spacing:-.02em}
+.brand span{color:var(--accent)}
+.gear{margin-left:auto; border:1px solid var(--line-2); background:var(--surface); border-radius:999px; padding:6px 12px; font-size:12px; font-weight:600; color:var(--ink-2); display:flex; gap:6px; align-items:center}
+.gear svg{width:15px; height:15px; stroke:currentColor; fill:none; stroke-width:1.8}
+.status{font-size:11px; color:var(--ink-3); width:100%; display:flex; gap:7px; align-items:center}
+.dot{width:6px; height:6px; border-radius:50%; background:var(--accent); flex:none}
+.dot.warn{background:var(--amber)}
+.dot.bad{background:var(--red)}
+
+.tabs{
+  position:fixed; left:0; right:0; bottom:0; z-index:40;
+  display:grid; grid-template-columns:repeat(4,1fr);
+  background:var(--surface); border-top:1px solid var(--line);
+  padding-bottom:env(safe-area-inset-bottom);
+}
+.tabs button{
+  background:none; border:0; padding:9px 4px 11px; color:var(--ink-3);
+  font-size:11px; font-weight:600; letter-spacing:.02em; display:flex; flex-direction:column; gap:4px; align-items:center;
+  border-top:2px solid transparent; margin-top:-1px;
+}
+.tabs button svg{width:21px; height:21px; stroke:currentColor; fill:none; stroke-width:1.7; stroke-linecap:round; stroke-linejoin:round}
+.tabs button[aria-current="true"]{color:var(--accent); border-top-color:var(--accent)}
+
+.view{display:none; padding-top:14px}
+.view.on{display:block}
+.card{background:var(--surface); border:1px solid var(--line); border-radius:var(--r); padding:14px}
+.card + .card{margin-top:12px}
+.row{display:flex; gap:8px; align-items:center}
+.row.wrap{flex-wrap:wrap}
+.grow{flex:1; min-width:0}
+.eyebrow{font-size:11px; text-transform:uppercase; letter-spacing:.09em; color:var(--ink-3); font-weight:700}
+.muted{color:var(--ink-2)}
+.small{font-size:13px}
+.xs{font-size:12px}
+h2.sec{font-size:19px; margin:22px 0 10px}
+h2.sec:first-child{margin-top:4px}
+
+label.field{display:flex; flex-direction:column; gap:5px; font-size:12px; color:var(--ink-2); font-weight:600}
+input[type=date],input[type=number],input[type=text],textarea,select{
+  background:var(--surface-2); border:1px solid var(--line); border-radius:var(--r-s);
+  padding:10px; width:100%; color:var(--ink); -webkit-appearance:none; appearance:none;
+}
+input[type=number]{font-variant-numeric:tabular-nums}
+textarea{resize:vertical; min-height:56px; font-family:inherit}
+
+input[type=range]{-webkit-appearance:none; appearance:none; width:100%; height:34px; background:transparent; padding:0; border:0}
+input[type=range]::-webkit-slider-runnable-track{height:6px; border-radius:999px; background:var(--line-2)}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none; appearance:none; width:26px; height:26px; border-radius:50%; background:var(--accent); border:3px solid var(--surface); margin-top:-10px; box-shadow:var(--shadow)}
+input[type=range]::-moz-range-track{height:6px; border-radius:999px; background:var(--line-2)}
+input[type=range]::-moz-range-thumb{width:22px; height:22px; border:3px solid var(--surface); border-radius:50%; background:var(--accent)}
+.slider b{font-size:15px; color:var(--ink); min-width:28px; text-align:right}
+
+.btn{border:1px solid var(--line-2); background:var(--surface); color:var(--ink); border-radius:999px; padding:9px 15px; font-size:13px; font-weight:600}
+.btn:hover{border-color:var(--ink-3)}
+.btn.primary{background:var(--accent); border-color:var(--accent); color:#fff}
+:root[data-theme="dark"] .btn.primary,
+:root:not([data-theme="light"]) .btn.primary{color:#0F1312}
+@media (prefers-color-scheme:light){:root:not([data-theme="dark"]) .btn.primary{color:#fff}}
+.btn.ghost{background:none; border-color:transparent; color:var(--ink-2); padding:7px 9px}
+.btn.danger{color:var(--red); border-color:var(--red); background:none}
+.btn.block{width:100%; border-radius:var(--r-s); padding:13px}
+.btn:disabled{opacity:.45}
+
+.seg{display:flex; background:var(--surface-2); border:1px solid var(--line); border-radius:999px; padding:3px; gap:3px}
+.seg button{flex:1; border:0; background:none; border-radius:999px; padding:9px 6px; font-size:13px; font-weight:600; color:var(--ink-2)}
+.seg button[aria-pressed="true"]{background:var(--surface); color:var(--accent); box-shadow:var(--shadow)}
+
+.chips{display:flex; gap:6px; flex-wrap:wrap}
+.chip{border:1px solid var(--line); background:var(--surface-2); border-radius:999px; padding:7px 12px; font-size:13px; font-weight:600; color:var(--ink-2)}
+.chip[aria-pressed="true"]{background:var(--accent-soft); border-color:var(--accent); color:var(--accent-ink)}
+.chip.warn[aria-pressed="true"]{background:var(--amber-soft); border-color:var(--amber); color:var(--amber)}
+.chip.sm{padding:4px 9px; font-size:11px}
+
+.exo{border:1px solid var(--line); border-radius:var(--r); overflow:hidden; background:var(--surface)}
+.exo + .exo{margin-top:10px}
+.exo-head{display:flex; align-items:center; gap:8px; padding:10px 12px; background:var(--surface-2); border-bottom:1px solid var(--line); flex-wrap:wrap}
+.exo-head h3{font-size:15px; font-weight:700; flex:1; min-width:120px}
+.exo-last{font-size:11px; color:var(--ink-3); padding:6px 12px 0}
+.sets{padding:8px 12px 12px}
+.set-row{display:grid; grid-template-columns:22px 1fr 1fr 1fr 28px; gap:6px; align-items:center; margin-top:6px}
+.set-row .idx{font-size:12px; color:var(--ink-3); font-variant-numeric:tabular-nums}
+.set-row input{padding:9px 4px; text-align:center}
+.set-head{display:grid; grid-template-columns:22px 1fr 1fr 1fr 28px; gap:6px; font-size:10px; text-transform:uppercase; letter-spacing:.06em; color:var(--ink-3); text-align:center}
+.set-head span:first-child{text-align:left}
+.iconbtn{border:0; background:none; color:var(--ink-3); font-size:18px; line-height:1; padding:4px}
+.iconbtn:hover{color:var(--red)}
+
+.grades{display:grid; grid-template-columns:repeat(auto-fill,minmax(60px,1fr)); gap:6px}
+.grade{border:1px solid var(--line); border-radius:var(--r-s); background:var(--surface-2); padding:8px 4px; text-align:center; font-variant-numeric:tabular-nums; font-size:13px; font-weight:600; color:var(--ink-2)}
+.grade b{display:block; font-size:16px; color:var(--rock); min-height:20px}
+.grade[data-n="0"] b{color:var(--ink-3); opacity:.35}
+.grade.on{border-color:var(--rock); background:var(--rock-soft)}
+
+.item{display:flex; gap:10px; align-items:flex-start; padding:11px 0; border-top:1px solid var(--line)}
+.item:first-child{border-top:0}
+.tagdot{width:8px; height:8px; border-radius:2px; margin-top:6px; flex:none}
+.tagdot.gym{background:var(--accent)}
+.tagdot.climb{background:var(--rock)}
+.item b{font-weight:700; font-size:14px}
+.item .meta{font-size:12px; color:var(--ink-2)}
+
+.cal{display:grid; grid-template-columns:repeat(7,minmax(0,1fr)); gap:4px}
+.cal .dow{font-size:10px; text-transform:uppercase; letter-spacing:.05em; color:var(--ink-3); text-align:center; padding-bottom:4px}
+.day{aspect-ratio:1; border:1px solid transparent; border-radius:var(--r-s); background:var(--surface-2); display:flex; flex-direction:column; align-items:center; justify-content:center; gap:3px; font-variant-numeric:tabular-nums; font-size:12px; color:var(--ink-2); padding:0}
+.day.empty{background:none}
+.day.today{border-color:var(--ink-3)}
+.day.has{background:var(--surface); border-color:var(--line); color:var(--ink); font-weight:600}
+.day .dots{display:flex; gap:2px; height:5px}
+.day .dots i{width:5px; height:5px; border-radius:50%; display:block}
+.day i.gym{background:var(--accent)}
+.day i.climb{background:var(--rock)}
+.day i.knee{background:var(--amber)}
+
+.bignum{font-size:26px; font-weight:700; line-height:1.05; font-variant-numeric:tabular-nums}
+.statgrid{display:flex; flex-wrap:wrap; gap:20px}
+.stat .bignum{font-size:22px}
+
+.tablewrap{overflow-x:auto; margin:0 -14px; padding:0 14px}
+table{border-collapse:collapse; width:100%; font-size:13px; min-width:420px}
+th{text-align:left; font-size:10px; text-transform:uppercase; letter-spacing:.06em; color:var(--ink-3); font-weight:700; padding:0 10px 7px 0; white-space:nowrap}
+td{padding:9px 10px 9px 0; border-top:1px solid var(--line); white-space:nowrap}
+td.n{font-variant-numeric:tabular-nums}
+td.name{white-space:normal; font-weight:600}
+.delta{font-size:11px; font-weight:700; padding:1px 6px; border-radius:999px; background:var(--accent-soft); color:var(--accent-ink)}
+.delta.flat{background:var(--surface-2); color:var(--ink-3)}
+.delta.down{background:var(--red-soft); color:var(--red)}
+
+.chart{width:100%; height:auto; display:block; overflow:visible}
+.chart text{font-size:9px; fill:var(--ink-3); font-variant-numeric:tabular-nums}
+.chart .grid{stroke:var(--line); stroke-width:1}
+.chart .axis{stroke:var(--line-2); stroke-width:1}
+.banner{display:flex; gap:8px; align-items:center; flex-wrap:wrap; font-size:12px; color:var(--amber); background:var(--amber-soft); border:1px solid color-mix(in srgb,var(--amber) 35%,transparent); border-radius:var(--r-s); padding:9px 11px; margin-bottom:12px}
+.banner .btn{padding:5px 11px; font-size:12px; margin-left:auto}
+.empty{text-align:center; color:var(--ink-3); font-size:13px; padding:24px 10px}
+
+.sheet-bg{position:fixed; inset:0; background:rgba(10,14,12,.45); z-index:50; display:none}
+.sheet-bg.on{display:block}
+.sheet{position:fixed; left:0; right:0; bottom:0; z-index:51; background:var(--surface); border-radius:16px 16px 0 0; border-top:1px solid var(--line); max-height:82vh; display:none; flex-direction:column; padding-bottom:env(safe-area-inset-bottom)}
+.sheet.on{display:flex}
+.sheet-head{padding:12px 14px; border-bottom:1px solid var(--line); display:flex; gap:8px; align-items:center}
+.sheet-body{overflow-y:auto; padding:12px 14px 22px}
+.exlist{display:flex; flex-direction:column}
+.exlist button{text-align:left; background:none; border:0; border-bottom:1px solid var(--line); padding:12px 2px; font-size:14px; color:var(--ink)}
+.exlist .cat{font-size:10px; text-transform:uppercase; letter-spacing:.08em; color:var(--ink-3); padding:14px 2px 5px; font-weight:700}
+
+.toast{position:fixed; left:50%; transform:translateX(-50%); bottom:calc(76px + env(safe-area-inset-bottom)); z-index:60; background:var(--ink); color:var(--paper); font-size:13px; font-weight:600; padding:9px 16px; border-radius:999px; opacity:0; pointer-events:none; transition:opacity .18s; max-width:90vw; text-align:center}
+.toast.on{opacity:1}
+
+@media (min-width:760px){
+  .wrap{padding-bottom:24px}
+  .tabs{position:static; grid-template-columns:repeat(4,max-content); border:1px solid var(--line); border-radius:999px; margin:14px 0 0; width:max-content; background:var(--surface)}
+  .tabs button{flex-direction:row; padding:9px 18px; font-size:13px; border-top:0; border-bottom:2px solid transparent; margin:0}
+  .tabs button[aria-current="true"]{border-top-color:transparent; border-bottom-color:var(--accent)}
+  .cols{display:grid; grid-template-columns:1fr 1fr; gap:12px; align-items:start}
+  .toast{bottom:24px}
+  .tablewrap{margin:0; padding:0}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important; animation:none!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <div class="brand">Treeni<span>kirja</span></div>
+    <button class="gear" id="openData"><svg viewBox="0 0 24 24"><path d="M12 15a3 3 0 100-6 3 3 0 000 6z"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 11-2.83 2.83l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 11-2.83-2.83l.06-.06A1.65 1.65 0 004.6 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 112.83-2.83l.06.06A1.65 1.65 0 009 4.6a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 112.83 2.83l-.06.06A1.65 1.65 0 0019.4 9c.2.63.77 1.05 1.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>Data</button>
+    <div class="status"><span class="dot" id="stDot"></span><span id="stText">Ladataan…</span></div>
+  </header>
+
+  <nav class="tabs" id="tabs" aria-label="Näkymät">
+    <button data-view="log" aria-current="true"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>Kirjaa</button>
+    <button data-view="cal"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg>Kalenteri</button>
+    <button data-view="prog"><svg viewBox="0 0 24 24"><path d="M4 19V5M4 19h16M8 15l4-5 3 3 5-7"/></svg>Kehitys</button>
+    <button data-view="knee"><svg viewBox="0 0 24 24"><path d="M3 12h4l3 8 4-16 3 8h4"/></svg>Polvi</button>
+  </nav>
+
+  <!-- ============ KIRJAA ============ -->
+  <section class="view on" id="v-log">
+    <div id="logBanner"></div>
+    <div class="card">
+      <div class="row" style="gap:10px">
+        <label class="field grow">Päivä
+          <input type="date" id="fDate">
+        </label>
+        <label class="field" style="width:116px">Kesto (min)
+          <input type="number" id="fDur" min="0" step="5" inputmode="numeric" placeholder="—">
+        </label>
+      </div>
+      <div class="seg" style="margin-top:12px" id="fType">
+        <button data-t="gym" aria-pressed="true">Salitreeni</button>
+        <button data-t="climb" aria-pressed="false">Kiipeily</button>
+      </div>
+    </div>
+
+    <div id="gymPane">
+      <div id="exos"></div>
+      <button class="btn block" id="addEx" style="margin-top:10px">+ Lisää liike</button>
+    </div>
+
+    <div id="climbPane" hidden>
+      <div class="card">
+        <div class="eyebrow">Sessio</div>
+        <div class="chips" style="margin-top:8px" id="cStyle">
+          <button class="chip" data-v="boulder-sisa" aria-pressed="false">Boulder sisä</button>
+          <button class="chip" data-v="boulder-ulko" aria-pressed="false">Boulder ulko</button>
+          <button class="chip" data-v="koysi-sisa" aria-pressed="false">Köysi sisä</button>
+          <button class="chip" data-v="koysi-ulko" aria-pressed="false">Köysi ulko</button>
+        </div>
+      </div>
+      <div class="card">
+        <div class="row">
+          <div class="eyebrow grow">Läpimenot vaikeusasteittain</div>
+          <span class="xs muted num" id="cTotal">0 kpl</span>
+        </div>
+        <div class="xs muted" style="margin:4px 0 10px">Napauta astetta lisätäksesi, pitkä painallus nollaa.</div>
+        <div class="grades" id="cGrades"></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="eyebrow">Polvi</div>
+      <label class="field slider" style="margin-top:12px">
+        <span class="row"><span class="grow">Kipu treenin aikana (0–10)</span><b class="num" id="kDuringOut">–</b></span>
+        <input type="range" min="0" max="10" step="1" id="fKDuring" value="0">
+      </label>
+      <label class="field slider" style="margin-top:14px">
+        <span class="row"><span class="grow">Kipu treenin jälkeen (0–10)</span><b class="num" id="kAfterOut">–</b></span>
+        <input type="range" min="0" max="10" step="1" id="fKAfter" value="0">
+      </label>
+      <div class="chips" style="margin-top:14px" id="fKneeFlags">
+        <button class="chip warn" data-v="stiff" aria-pressed="false">Jäykkyyttä</button>
+        <button class="chip warn" data-v="swell" aria-pressed="false">Turvotusta</button>
+      </div>
+      <label class="field" style="margin-top:12px">Polvimuistiinpano
+        <input type="text" id="fKneeNote" placeholder="esim. jäykkä alussa, ei kipua kyykyssä">
+      </label>
+      <div class="xs muted" style="margin-top:8px">Merkitse yksittäinen liike liikkeen "Polvi oireili" -napista jos juuri se ärsytti polvea.</div>
+    </div>
+
+    <div class="card">
+      <div class="eyebrow">Päivän mittarit</div>
+      <div class="row wrap" style="gap:10px; margin-top:8px">
+        <label class="field grow" style="min-width:90px">Paino (kg)
+          <input type="number" id="fBw" step="0.1" inputmode="decimal" placeholder="—">
+        </label>
+        <label class="field grow" style="min-width:90px">Uni (h)
+          <input type="number" id="fSleep" step="0.5" inputmode="decimal" placeholder="—">
+        </label>
+        <label class="field grow" style="min-width:90px">Palautuminen
+          <select id="fRec">
+            <option value="">—</option>
+            <option value="1">1 · poikki</option>
+            <option value="2">2</option>
+            <option value="3">3</option>
+            <option value="4">4</option>
+            <option value="5">5 · terävä</option>
+          </select>
+        </label>
+      </div>
+      <label class="field" style="margin-top:10px">Treenimuistiinpano
+        <textarea id="fNote" placeholder="Fiilis, tekniikka, mitä kokeilit…"></textarea>
+      </label>
+    </div>
+
+    <div class="row" style="margin-top:12px; gap:8px">
+      <button class="btn primary grow" id="save" style="border-radius:var(--r-s); padding:14px">Tallenna treeni</button>
+      <button class="btn" id="reset">Tyhjennä</button>
+    </div>
+    <div class="xs muted" id="editHint" style="margin-top:8px" hidden></div>
+
+    <h2 class="sec">Viimeisimmät</h2>
+    <div class="card" id="recent"></div>
+  </section>
+
+  <!-- ============ KALENTERI ============ -->
+  <section class="view" id="v-cal">
+    <div id="calBanner"></div>
+    <div class="card">
+      <div class="row" style="margin-bottom:12px">
+        <button class="btn ghost" id="calPrev" aria-label="Edellinen kuukausi">‹</button>
+        <h2 class="grow" style="font-size:17px; text-align:center" id="calTitle">—</h2>
+        <button class="btn ghost" id="calNext" aria-label="Seuraava kuukausi">›</button>
+      </div>
+      <div class="cal" id="calGrid"></div>
+      <div class="row wrap xs muted" style="margin-top:12px; gap:14px">
+        <span class="row" style="gap:5px"><i class="tagdot gym" style="margin:0"></i> Sali</span>
+        <span class="row" style="gap:5px"><i class="tagdot climb" style="margin:0"></i> Kiipeily</span>
+        <span class="row" style="gap:5px"><i class="tagdot" style="margin:0;background:var(--amber)"></i> Polvi oireili</span>
+      </div>
+    </div>
+    <div class="card" id="calSummary"></div>
+    <div id="calDay"></div>
+  </section>
+
+  <!-- ============ KEHITYS ============ -->
+  <section class="view" id="v-prog">
+    <div id="progBanner"></div>
+    <div class="card">
+      <div class="row">
+        <div class="grow">
+          <div class="eyebrow">Viikkovolyymi</div>
+          <div class="xs muted">Toistot × paino, viimeiset 14 viikkoa</div>
+        </div>
+        <span class="num bignum" id="volNow" style="font-size:19px"></span>
+      </div>
+      <div id="volChart" style="margin-top:12px"></div>
+    </div>
+
+    <div class="card">
+      <div class="row wrap" style="gap:8px">
+        <div class="grow" style="min-width:140px">
+          <div class="eyebrow">Liikkeen kehitys</div>
+          <div class="xs muted">Arvioitu maksimi (e1RM)</div>
+        </div>
+        <select id="exSel" style="width:auto; min-width:150px"></select>
+      </div>
+      <div id="exChart" style="margin-top:12px"></div>
+    </div>
+
+    <div class="cols">
+      <div class="card">
+        <div class="eyebrow">Treenit kuukausittain</div>
+        <div id="monChart" style="margin-top:12px"></div>
+      </div>
+      <div class="card">
+        <div class="eyebrow">Kehonpaino</div>
+        <div id="bwChart" style="margin-top:12px"></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="eyebrow">Salin ennätykset</div>
+      <div class="xs muted" style="margin:3px 0 12px">Paras sarja ja siitä arvioitu maksimi. Δ vertaa kolmen kuukauden takaiseen.</div>
+      <div class="tablewrap"><table id="prTable"></table></div>
+    </div>
+    <div class="card">
+      <div class="eyebrow">Kiipeilyn ennätykset</div>
+      <div class="tablewrap"><table id="climbTable"></table></div>
+    </div>
+  </section>
+
+  <!-- ============ POLVI ============ -->
+  <section class="view" id="v-knee">
+    <div id="kneeBanner"></div>
+    <div class="card" id="kneeStatus"></div>
+
+    <div class="card">
+      <div class="eyebrow">Kipukäyrä</div>
+      <div class="xs muted" style="margin:3px 0 6px">Treeneittäin, 0 = ei kipua</div>
+      <div id="kneePainChart"></div>
+    </div>
+
+    <div class="card">
+      <div class="eyebrow">Kuorma vs. oireet</div>
+      <div class="xs muted" style="margin:3px 0 6px">Salin viikkovolyymi samalta ajalta — vertaa kipukäyrään</div>
+      <div id="kneeLoadChart"></div>
+    </div>
+
+    <div class="card">
+      <div class="eyebrow">Aamujäykkyys</div>
+      <div class="xs muted" style="margin:3px 0 8px">Kirjaa herätessä, ei tarvitse kirjata treeniä</div>
+      <div class="row wrap" style="gap:6px" id="mStiffChips">
+        <button class="chip warn" data-v="1" aria-pressed="false">1 · notkea</button>
+        <button class="chip warn" data-v="2" aria-pressed="false">2</button>
+        <button class="chip warn" data-v="3" aria-pressed="false">3</button>
+        <button class="chip warn" data-v="4" aria-pressed="false">4</button>
+        <button class="chip warn" data-v="5" aria-pressed="false">5 · jäykkä</button>
+      </div>
+      <div id="mStiffChart" style="margin-top:12px"></div>
+    </div>
+
+    <div class="card">
+      <div class="eyebrow">Liikkeet jotka ovat oireilleet</div>
+      <div id="kneeAggr" style="margin-top:8px"></div>
+    </div>
+
+    <div class="card">
+      <div class="eyebrow">Polvimuistiinpanot</div>
+      <div id="kneeNotesList" style="margin-top:4px"></div>
+    </div>
+  </section>
+
+  <!-- ============ DATA ============ -->
+  <section class="view" id="v-data">
+    <button class="btn ghost" id="dataBack" style="margin-bottom:6px">‹ Takaisin</button>
+
+    <div class="card">
+      <div class="eyebrow">Varmuuskopio</div>
+      <div class="small" id="backupInfo" style="margin:6px 0 12px"></div>
+      <button class="btn primary block" id="expJson">Vie JSON-varmuuskopio</button>
+      <button class="btn block" id="expCsv" style="margin-top:8px">Vie CSV (Sheets / Excel)</button>
+      <div class="xs muted" style="margin-top:10px">JSON sisältää kaiken ja voidaan tuoda takaisin. Vie se säännöllisesti esim. Drive-kansioon.</div>
+    </div>
+
+    <div class="card">
+      <div class="eyebrow">Palautus</div>
+      <div class="small muted" style="margin:6px 0 10px">Tuo aiemmin viety JSON-tiedosto. Voit korvata nykyisen datan tai yhdistää.</div>
+      <label class="btn block" style="text-align:center; display:block">Tuo JSON-tiedostosta
+        <input type="file" id="impJson" accept="application/json,.json" hidden>
+      </label>
+    </div>
+
+    <div class="card">
+      <div class="eyebrow">Tallennustila</div>
+      <div class="small" id="storageInfo" style="margin-top:8px"></div>
+      <button class="btn block" id="reqPersist" style="margin-top:10px" hidden>Pyydä pysyvää tallennusta</button>
+    </div>
+
+    <div class="card">
+      <div class="eyebrow" style="color:var(--red)">Vaaralliset toiminnot</div>
+      <div class="small muted" style="margin:6px 0 10px">Poistaa kaikki treenit, päiväkirjamerkinnät ja omat liikkeet tästä laitteesta. Vie varmuuskopio ensin.</div>
+      <button class="btn danger block" id="wipe">Tyhjennä kaikki data</button>
+    </div>
+
+    <div class="xs muted" style="margin-top:14px; text-align:center">
+      Treenikirja · data tallentuu vain tähän laitteeseen ja selaimeen.<br><span id="verLine"></span>
+    </div>
+  </section>
+</div>
+
+<div class="sheet-bg" id="sheetBg"></div>
+<div class="sheet" id="sheet" role="dialog" aria-label="Valitse liike">
+  <div class="sheet-head">
+    <input type="text" id="exSearch" placeholder="Hae tai kirjoita uusi liike…" autocomplete="off">
+    <button class="btn ghost" id="sheetClose">Sulje</button>
+  </div>
+  <div class="sheet-body"><div class="exlist" id="exList"></div></div>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+(function(){
+"use strict";
+
+/* ============================================================
+   1. Vakiot
+   ============================================================ */
+const APP_VERSION = 1;
+const CATALOG = {
+  "Jalat": ["Kyykky","Etukyykky","Jalkaprässi","Maastaveto","Romanialainen maastaveto","Askelkyykky","Bulgarialainen askelkyykky","Yhden jalan kyykky penkille","Jalan ojennus","Jalan koukistus","Nordic hamstring","Lonkan ojennus (hip thrust)","Pohjenousu","Askelnousu"],
+  "Kuntoutus & polvi": ["Terminaalinen polven ojennus","Jalan ojennus (kevyt)","Etureiden isometria seinää vasten","Askelnousu matala","Simpukka (clamshell)","Lonkan loitonnus kyljellään","Tasapaino yhdellä jalalla","Pohjenousu yhdellä jalalla","Copenhagen plank","Kävelylenkki"],
+  "Veto": ["Leuanveto","Ylätalja","Kulmasoutu","Tankosoutu","Käsipainosoutu","Face pull","Hauiskääntö","Sormivoimalauta","Campus-lauta","Rengassoutu"],
+  "Työntö": ["Penkkipunnerrus","Vinopenkkipunnerrus","Pystypunnerrus","Käsipainopunnerrus","Dippi","Punnerrus","Ojentajapunnerrus","Sivunostot"],
+  "Keskivartalo": ["Lankku","Sivulankku","Riipuntajalannosto","Vatsarutistus","Ab wheel","Pallof press"]
+};
+const BOULDER = ["4","5","5+","6A","6A+","6B","6B+","6C","6C+","7A","7A+","7B","7B+","7C","7C+","8A"];
+const ROUTE   = ["5","5+","6a","6a+","6b","6b+","6c","6c+","7a","7a+","7b","7b+","7c","7c+","8a"];
+const STYLE_LABEL = {"boulder-sisa":"Boulder sisä","boulder-ulko":"Boulder ulko","koysi-sisa":"Köysi sisä","koysi-ulko":"Köysi ulko"};
+const MONTHS = ["tammikuu","helmikuu","maaliskuu","huhtikuu","toukokuu","kesäkuu","heinäkuu","elokuu","syyskuu","lokakuu","marraskuu","joulukuu"];
+const DOW = ["ma","ti","ke","to","pe","la","su"];
+const BACKUP_NUDGE_SESSIONS = 8;
+const BACKUP_NUDGE_DAYS = 30;
+
+/* ============================================================
+   2. Apurit
+   ============================================================ */
+const $ = s => document.querySelector(s);
+const $$ = s => Array.from(document.querySelectorAll(s));
+const num = v => { const n = parseFloat(String(v==null?"":v).replace(",", ".")); return isFinite(n) ? n : 0; };
+const esc = s => String(s==null?"":s).replace(/[&<>"]/g, c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+function iso(d){ return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0"); }
+function todayStr(){ return iso(new Date()); }
+function parseISO(s){ const p=String(s).split("-").map(Number); return new Date(p[0],p[1]-1,p[2]); }
+function fiDate(s){ const d=parseISO(s); return d.getDate()+"."+(d.getMonth()+1)+"."; }
+function fmt(n, d){ d = d==null?0:d; return (isFinite(n)?n:0).toLocaleString("fi-FI",{minimumFractionDigits:d, maximumFractionDigits:d}); }
+function nkpl(n, one, many){ return n+" "+(n===1?one:many); }
+function e1rm(w, r){ w=num(w); r=num(r); if(!w||!r||r>15) return 0; return w*(1+r/30); }
+function weekKey(d){ const t=new Date(d.getFullYear(),d.getMonth(),d.getDate()); const day=(t.getDay()+6)%7; t.setDate(t.getDate()-day); return iso(t); }
+function daysAgo(isoStr){ return Math.floor((Date.now()-new Date(isoStr).getTime())/864e5); }
+const LS = {
+  get(k,f){ try{ const v=localStorage.getItem(k); return v?JSON.parse(v):f; }catch(e){ return f; } },
+  set(k,v){ try{ localStorage.setItem(k,JSON.stringify(v)); }catch(e){} }
+};
+function setStatus(txt, level){
+  $("#stText").textContent = txt;
+  $("#stDot").className = "dot" + (level ? " "+level : "");
+}
+let toastT;
+function toast(msg){
+  const t=$("#toast"); t.textContent=msg; t.classList.add("on");
+  clearTimeout(toastT); toastT=setTimeout(()=>t.classList.remove("on"),2400);
+}
+
+/* ============================================================
+   3. Tallennus: IndexedDB (varajärjestelmänä localStorage)
+   ============================================================ */
+const DBN="treenikirja", DBV=1;
+let _db=null, USE_LS=false;
+const mem = { sessions:[], dayLogs:[], meta:[] };
+const kpOf = store => store==="meta" ? "key" : store==="dayLogs" ? "date" : "id";
+
+function openDB(){
+  return new Promise((res,rej)=>{
+    let r;
+    try{ r = indexedDB.open(DBN,DBV); }catch(e){ return rej(e); }
+    r.onupgradeneeded = ()=>{
+      const db=r.result;
+      if(!db.objectStoreNames.contains("sessions")) db.createObjectStore("sessions",{keyPath:"id"});
+      if(!db.objectStoreNames.contains("dayLogs"))  db.createObjectStore("dayLogs",{keyPath:"date"});
+      if(!db.objectStoreNames.contains("meta"))     db.createObjectStore("meta",{keyPath:"key"});
+    };
+    r.onsuccess = ()=>res(r.result);
+    r.onerror   = ()=>rej(r.error);
+  });
+}
+function idbAll(store){ return new Promise((res,rej)=>{ const q=_db.transaction(store,"readonly").objectStore(store).getAll(); q.onsuccess=()=>res(q.result||[]); q.onerror=()=>rej(q.error); }); }
+function idbPut(store,val){ return new Promise((res,rej)=>{ const q=_db.transaction(store,"readwrite").objectStore(store).put(val); q.onsuccess=()=>res(); q.onerror=()=>rej(q.error); }); }
+function idbDel(store,key){ return new Promise((res,rej)=>{ const q=_db.transaction(store,"readwrite").objectStore(store).delete(key); q.onsuccess=()=>res(); q.onerror=()=>rej(q.error); }); }
+function idbClear(store){ return new Promise((res,rej)=>{ const q=_db.transaction(store,"readwrite").objectStore(store).clear(); q.onsuccess=()=>res(); q.onerror=()=>rej(q.error); }); }
+
+function sortSessions(){ mem.sessions.sort((a,b)=> b.date.localeCompare(a.date) || String(b.createdAt||"").localeCompare(String(a.createdAt||""))); }
+
+async function loadAll(){
+  if(USE_LS){
+    mem.sessions = LS.get("tk_sessions",[]);
+    mem.dayLogs  = LS.get("tk_dayLogs",[]);
+    mem.meta     = LS.get("tk_meta",[]);
+  } else {
+    mem.sessions = await idbAll("sessions");
+    mem.dayLogs  = await idbAll("dayLogs");
+    mem.meta     = await idbAll("meta");
+  }
+  sortSessions();
+}
+async function put(store,val){
+  const arr=mem[store], kp=kpOf(store), i=arr.findIndex(x=>x[kp]===val[kp]);
+  if(i>=0) arr[i]=val; else arr.push(val);
+  if(store==="sessions") sortSessions();
+  if(USE_LS) LS.set("tk_"+store,arr); else await idbPut(store,val);
+}
+async function del(store,key){
+  const arr=mem[store], kp=kpOf(store), i=arr.findIndex(x=>x[kp]===key);
+  if(i>=0) arr.splice(i,1);
+  if(USE_LS) LS.set("tk_"+store,arr); else await idbDel(store,key);
+}
+async function clearAll(){
+  mem.sessions=[]; mem.dayLogs=[]; mem.meta=[];
+  if(USE_LS){ LS.set("tk_sessions",[]); LS.set("tk_dayLogs",[]); LS.set("tk_meta",[]); }
+  else { await idbClear("sessions"); await idbClear("dayLogs"); await idbClear("meta"); }
+}
+function metaGet(k,f){ const r=mem.meta.find(x=>x.key===k); return r ? r.value : f; }
+async function setMeta(k,v){ await put("meta",{key:k,value:v}); }
+function getCustom(){ return metaGet("customExercises",[]); }
+async function saveCustom(list){ await setMeta("customExercises", list); }
+function dget(date){ return mem.dayLogs.find(x=>x.date===date) || null; }
+async function dput(date, patch){
+  const cur = dget(date) || {date};
+  const next = Object.assign({}, cur, patch, {date});
+  Object.keys(next).forEach(k=>{ if(next[k]==="" || next[k]==null) delete next[k]; });
+  next.date = date;
+  if(Object.keys(next).length<=1){ await del("dayLogs",date); }
+  else { await put("dayLogs", next); }
+}
+function mapDays(arr){ const o={}; arr.forEach(d=>o[d.date]=d); return o; }
+
+/* ============================================================
+   4. Tila
+   ============================================================ */
+let draft = blankDraft();
+let editingId = null;
+let calMonth = new Date();
+let current = "log";
+let prevView = "log";
+
+function blankDraft(){
+  return {
+    date: todayStr(), type:"gym", dur:"",
+    exercises:[],
+    climb:{ style:"", sends:{} },
+    knee:{ during:"", after:"", stiff:false, swell:false, note:"" },
+    kneeTouched:false,
+    note:"", bw:"", sleep:"", rec:""
+  };
+}
+
+/* ============================================================
+   5. Laskenta
+   ============================================================ */
+function volumeOf(s){
+  if(s.type!=="gym") return 0;
+  let v=0; (s.exercises||[]).forEach(e=>(e.sets||[]).forEach(st=>{ v += num(st.reps)*num(st.weight); }));
+  return v;
+}
+function sendsOf(s){ let n=0; const sd=(s.climb&&s.climb.sends)||{}; Object.keys(sd).forEach(k=>n+=sd[k]); return n; }
+function hasKnee(s){ const k=s.knee; return !!(k && (k.during!=null || k.after!=null || k.stiff || k.swell || (k.note&&k.note.trim()))); }
+function allExerciseNames(){
+  const set=new Set();
+  Object.values(CATALOG).forEach(a=>a.forEach(n=>set.add(n)));
+  getCustom().forEach(n=>set.add(n));
+  mem.sessions.forEach(s=>(s.exercises||[]).forEach(e=>set.add(e.name)));
+  return Array.from(set);
+}
+function lastPerformance(name, beforeId){
+  for(const s of mem.sessions){
+    if(s.id===beforeId) continue;
+    const e=(s.exercises||[]).find(x=>x.name===name);
+    if(e && e.sets && e.sets.length){
+      const best=e.sets.slice().sort((a,b)=>e1rm(b.weight,b.reps)-e1rm(a.weight,a.reps))[0];
+      return fiDate(s.date)+" · "+nkpl(e.sets.length,"sarja","sarjaa")+", paras "+num(best.reps)+"×"+fmt(num(best.weight),num(best.weight)%1?1:0)+" kg";
+    }
+  }
+  return null;
+}
+function kneeAggravators(sessions){
+  const m={};
+  sessions.forEach(s=>(s.exercises||[]).forEach(e=>{
+    if(e.kneeFlag){ const o=m[e.name]=m[e.name]||{n:0,last:""}; o.n++; if(s.date>o.last) o.last=s.date; }
+  }));
+  return Object.keys(m).map(k=>({name:k, n:m[k].n, last:m[k].last})).sort((a,b)=> b.n-a.n || b.last.localeCompare(a.last));
+}
+
+/* ============================================================
+   6. Demodata (näkyy vain kun omaa dataa ei ole)
+   ============================================================ */
+let DEMO=null;
+function demo(){
+  const S=[], D=[], base=new Date();
+  const plan=[["Kyykky",70],["Penkkipunnerrus",60],["Maastaveto",95],["Leuanveto",0],["Bulgarialainen askelkyykky",22],["Jalkaprässi",120]];
+  for(let w=11; w>=0; w--){
+    for(const off of [1,3,5]){
+      const d=new Date(base); d.setDate(d.getDate()-w*7-off);
+      const ds=iso(d);
+      if(off===5){
+        const idx=Math.min(9, 4+Math.floor((11-w)/4));
+        const sends={}; sends[BOULDER[idx]]=2+((w+off)%3); sends[BOULDER[Math.max(0,idx-1)]]=4;
+        S.push({id:"demo"+w+"_"+off, date:ds, type:"climb", dur:80,
+          climb:{style:"boulder-sisa", sends:sends},
+          knee:{during:2, after:3, stiff:(w%2===0), swell:false, note:""}, note:"", createdAt:ds});
+      } else {
+        const exs=plan.filter((p,i)=>(i+off)%2===0).slice(0,4).map(p=>{
+          const wgt = p[1] ? Math.round((p[1]+(11-w)*1.5)/2.5)*2.5 : 0;
+          return {name:p[0], kneeFlag:(p[0]==="Bulgarialainen askelkyykky" && w>7), sets:[1,2,3].map(()=>({reps:5, weight:wgt, rpe:8}))};
+        });
+        S.push({id:"demo"+w+"_"+off, date:ds, type:"gym", dur:65, exercises:exs,
+          knee:{during:(w>8?3:1), after:(w>8?4:2), stiff:(w>8), swell:false, note:(w>8?"jäykkä alkuun, aukesi lämmittelyssä":"")}, note:"", createdAt:ds});
+      }
+      D.push({date:ds, bw: Math.round((78-(11-w)*0.05)*10)/10, sleep:7.5, rec:4, morningStiff:(w>8?3:2)});
+    }
+  }
+  return { sessions:S.sort((a,b)=>b.date.localeCompare(a.date)), days:mapDays(D) };
+}
+function view(){
+  if(mem.sessions.length) return { sessions:mem.sessions, days:mapDays(mem.dayLogs), isDemo:false };
+  if(!DEMO) DEMO=demo();
+  return { sessions:DEMO.sessions, days:DEMO.days, isDemo:true };
+}
+function demoBanner(){
+  return '<div class="banner"><span>Esimerkkidata</span><span style="color:var(--ink-2)">Näet miltä näkymä näyttää. Ensimmäinen oma treeni korvaa tämän.</span></div>';
+}
+
+/* ============================================================
+   7. Kaaviot
+   ============================================================ */
+function svgBars(items, color, unit){
+  const W=340,H=132,pl=36,pr=6,pt=10,pb=20;
+  const max=Math.max(1, ...items.map(i=>i.value));
+  const step=(W-pl-pr)/Math.max(1,items.length), bw=Math.max(3, step*0.6);
+  let g="";
+  [0,0.5,1].forEach(f=>{
+    const y=pt+(1-f)*(H-pt-pb);
+    g+='<line class="grid" x1="'+pl+'" y1="'+y.toFixed(1)+'" x2="'+(W-pr)+'" y2="'+y.toFixed(1)+'"/>';
+    g+='<text x="'+(pl-5)+'" y="'+(y+3).toFixed(1)+'" text-anchor="end">'+(max*f>=1000?Math.round(max*f/1000)+"k":Math.round(max*f))+'</text>';
+  });
+  items.forEach((it,i)=>{
+    const h=(it.value/max)*(H-pt-pb);
+    const x=pl+i*step+(step-bw)/2, y=H-pb-h;
+    g+='<rect x="'+x.toFixed(1)+'" y="'+y.toFixed(1)+'" width="'+bw.toFixed(1)+'" height="'+Math.max(0,h).toFixed(1)+'" rx="2" fill="'+(it.color||color)+'"'+(it.value?'':' opacity=".25"')+'><title>'+esc(it.label+": "+fmt(it.value)+" "+(unit||""))+'</title></rect>';
+    if(i%Math.ceil(items.length/5)===0)
+      g+='<text x="'+(x+bw/2).toFixed(1)+'" y="'+(H-6)+'" text-anchor="middle">'+esc(it.short||it.label)+'</text>';
+  });
+  g+='<line class="axis" x1="'+pl+'" y1="'+(H-pb)+'" x2="'+(W-pr)+'" y2="'+(H-pb)+'"/>';
+  return '<svg class="chart" viewBox="0 0 '+W+' '+H+'" role="img">'+g+'</svg>';
+}
+function svgLine(pts, color, unit, decs, fixed){
+  if(pts.length<2) return '<div class="empty">Vähintään kaksi kirjausta tarvitaan käyrään.</div>';
+  const W=340,H=142,pl=36,pr=8,pt=12,pb=22;
+  const ys=pts.map(p=>p.y);
+  let min=Math.min(...ys), max=Math.max(...ys);
+  if(max-min<0.001){ max=min+1; }
+  const pad=(max-min)*0.12; min-=pad; max+=pad;
+  if(fixed){ min=fixed[0]; max=fixed[1]; }
+  const X=i=>pl+(i/(pts.length-1))*(W-pl-pr);
+  const Y=v=>pt+(1-(v-min)/(max-min))*(H-pt-pb);
+  let g="";
+  [0,0.5,1].forEach(f=>{
+    const val=min+f*(max-min), y=Y(val);
+    g+='<line class="grid" x1="'+pl+'" y1="'+y.toFixed(1)+'" x2="'+(W-pr)+'" y2="'+y.toFixed(1)+'"/>';
+    g+='<text x="'+(pl-5)+'" y="'+(y+3).toFixed(1)+'" text-anchor="end">'+fmt(val,decs==null?0:decs)+'</text>';
+  });
+  const d=pts.map((p,i)=>(i?"L":"M")+X(i).toFixed(1)+" "+Y(p.y).toFixed(1)).join(" ");
+  const area=d+" L"+X(pts.length-1).toFixed(1)+" "+(H-pb)+" L"+X(0).toFixed(1)+" "+(H-pb)+" Z";
+  g+='<path d="'+area+'" fill="'+color+'" opacity=".10"/>';
+  g+='<path d="'+d+'" fill="none" stroke="'+color+'" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>';
+  pts.forEach((p,i)=>{
+    const last=i===pts.length-1;
+    g+='<circle cx="'+X(i).toFixed(1)+'" cy="'+Y(p.y).toFixed(1)+'" r="'+(last?3.6:2)+'" fill="'+(last?color:"var(--surface)")+'" stroke="'+color+'" stroke-width="1.6"><title>'+esc(p.label+": "+fmt(p.y,decs==null?0:decs)+" "+(unit||""))+'</title></circle>';
+  });
+  g+='<text x="'+pl+'" y="'+(H-5)+'">'+esc(pts[0].short||"")+'</text>';
+  g+='<text x="'+(W-pr)+'" y="'+(H-5)+'" text-anchor="end">'+esc(pts[pts.length-1].short||"")+'</text>';
+  return '<svg class="chart" viewBox="0 0 '+W+' '+H+'" role="img">'+g+'</svg>';
+}
+function svgLines(labels, series, opts){
+  opts=opts||{};
+  const n=labels.length;
+  if(n<2) return '<div class="empty">Vähintään kaksi kirjausta tarvitaan käyrään.</div>';
+  const W=340,H=156,pl=28,pr=8,pt=12,pb=40;
+  let min=opts.min, max=opts.max;
+  if(min==null||max==null){
+    const all=[]; series.forEach(s=>s.ys.forEach(v=>{ if(v!=null) all.push(v); }));
+    min=Math.min.apply(null,all); max=Math.max.apply(null,all);
+    if(max-min<0.001) max=min+1;
+  }
+  const X=i=>pl+(i/(n-1))*(W-pl-pr);
+  const Y=v=>pt+(1-(v-min)/(max-min))*(H-pt-pb);
+  let g="";
+  [0,0.5,1].forEach(f=>{
+    const val=min+f*(max-min), y=Y(val);
+    g+='<line class="grid" x1="'+pl+'" y1="'+y.toFixed(1)+'" x2="'+(W-pr)+'" y2="'+y.toFixed(1)+'"/>';
+    g+='<text x="'+(pl-4)+'" y="'+(y+3).toFixed(1)+'" text-anchor="end">'+fmt(val,opts.decs||0)+'</text>';
+  });
+  series.forEach(s=>{
+    let d="", pen=false;
+    s.ys.forEach((v,i)=>{ if(v==null){ pen=false; return; } d+=(pen?"L":"M")+X(i).toFixed(1)+" "+Y(v).toFixed(1)+" "; pen=true; });
+    g+='<path d="'+d+'" fill="none" stroke="'+s.color+'" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>';
+    s.ys.forEach((v,i)=>{ if(v==null) return; g+='<circle cx="'+X(i).toFixed(1)+'" cy="'+Y(v).toFixed(1)+'" r="2.2" fill="'+s.color+'"><title>'+esc(labels[i]+" · "+s.name+" "+fmt(v,opts.decs||0))+'</title></circle>'; });
+  });
+  [0, Math.floor((n-1)/2), n-1].forEach(i=>{
+    g+='<text x="'+X(i).toFixed(1)+'" y="'+(H-20)+'" text-anchor="middle">'+esc(labels[i])+'</text>';
+  });
+  let lx=pl;
+  series.forEach(s=>{
+    g+='<rect x="'+lx+'" y="'+(H-9)+'" width="10" height="4" rx="1" fill="'+s.color+'"/>';
+    g+='<text x="'+(lx+14)+'" y="'+(H-5)+'">'+esc(s.name)+'</text>';
+    lx += 26 + s.name.length*5.4;
+  });
+  return '<svg class="chart" viewBox="0 0 '+W+' '+H+'" role="img">'+g+'</svg>';
+}
+
+/* ============================================================
+   8. Kirjausnäkymä
+   ============================================================ */
+function quickChips(){
+  const freq={};
+  mem.sessions.forEach(s=>(s.exercises||[]).forEach(e=>{ freq[e.name]=(freq[e.name]||0)+1; }));
+  const q=Object.keys(freq).sort((a,b)=>freq[b]-freq[a]).slice(0,5);
+  return q.length ? {list:q, own:true} : {list:["Kyykky","Penkkipunnerrus","Maastaveto","Leuanveto"], own:false};
+}
+function renderExos(){
+  const host=$("#exos");
+  if(!draft.exercises.length){
+    const last=mem.sessions.find(s=>s.type==="gym" && (s.exercises||[]).length);
+    const qc=quickChips();
+    host.innerHTML = '<div class="card">'+
+      '<div class="eyebrow">Aloita nopeasti</div>'+
+      (last ? '<button class="btn block" data-repeat="'+esc(last.id)+'" style="margin-top:9px">Toista '+esc(fiDate(last.date))+' treeni ('+nkpl(last.exercises.length,"liike","liikettä")+')</button>' : '')+
+      '<div class="xs muted" style="margin:12px 0 7px">'+(qc.own?"Käytetyimmät liikkeesi":"Yleisiä liikkeitä")+'</div>'+
+      '<div class="chips">'+qc.list.map(n=>'<button class="chip" data-quick="'+esc(n)+'">+ '+esc(n)+'</button>').join("")+'</div>'+
+    '</div>';
+    return;
+  }
+  host.innerHTML = draft.exercises.map((e,ei)=>{
+    const last=lastPerformance(e.name, editingId);
+    const rows=e.sets.map((st,si)=>
+      '<div class="set-row">'+
+        '<span class="idx">'+(si+1)+'</span>'+
+        '<input type="number" inputmode="numeric" min="0" step="1" value="'+esc(st.reps)+'" data-e="'+ei+'" data-s="'+si+'" data-f="reps" aria-label="Toistot">'+
+        '<input type="number" inputmode="decimal" min="0" step="0.5" value="'+esc(st.weight)+'" data-e="'+ei+'" data-s="'+si+'" data-f="weight" aria-label="Paino kilogrammoina">'+
+        '<input type="number" inputmode="decimal" min="1" max="10" step="0.5" value="'+esc(st.rpe)+'" data-e="'+ei+'" data-s="'+si+'" data-f="rpe" aria-label="RPE eli tuntuma">'+
+        '<button class="iconbtn" data-del-set="'+ei+':'+si+'" aria-label="Poista sarja">×</button>'+
+      '</div>').join("");
+    return '<div class="exo">'+
+      '<div class="exo-head">'+
+        '<h3>'+esc(e.name)+'</h3>'+
+        '<button class="chip warn sm" data-knee-ex="'+ei+'" aria-pressed="'+(e.kneeFlag?"true":"false")+'">Polvi oireili</button>'+
+        '<button class="btn ghost" data-del-ex="'+ei+'" aria-label="Poista liike">Poista</button>'+
+      '</div>'+
+      (last ? '<div class="exo-last">Viimeksi: '+esc(last)+'</div>' : '<div class="exo-last">Ensimmäinen kerta kirjattuna</div>')+
+      '<div class="sets">'+
+        '<div class="set-head"><span>#</span><span>Toistot</span><span>Paino kg</span><span>RPE</span><span></span></div>'+
+        rows+
+        '<button class="btn" data-add-set="'+ei+'" style="margin-top:9px; width:100%">+ Sarja</button>'+
+      '</div></div>';
+  }).join("");
+}
+function renderGrades(){
+  const isRoute=draft.climb.style.indexOf("koysi")===0;
+  const list=isRoute?ROUTE:BOULDER;
+  $("#cGrades").innerHTML = list.map(gr=>{
+    const n=draft.climb.sends[gr]||0;
+    return '<button class="grade'+(n?" on":"")+'" data-n="'+n+'" data-g="'+esc(gr)+'">'+esc(gr)+'<b>'+(n||"·")+'</b></button>';
+  }).join("");
+  $("#cTotal").textContent = sendsOf({climb:draft.climb})+" kpl";
+}
+function syncForm(){
+  $("#fDate").value = draft.date;
+  $("#fDur").value = draft.dur;
+  $$("#fType button").forEach(b=>b.setAttribute("aria-pressed", String(b.dataset.t===draft.type)));
+  $("#gymPane").hidden = draft.type!=="gym";
+  $("#climbPane").hidden = draft.type!=="climb";
+  $$("#cStyle button").forEach(b=>b.setAttribute("aria-pressed", String(b.dataset.v===draft.climb.style)));
+
+  $("#fKDuring").value = draft.knee.during===""?0:draft.knee.during;
+  $("#fKAfter").value  = draft.knee.after===""?0:draft.knee.after;
+  $("#kDuringOut").textContent = draft.kneeTouched||draft.knee.during!=="" ? String(draft.knee.during===""?0:draft.knee.during) : "–";
+  $("#kAfterOut").textContent  = draft.kneeTouched||draft.knee.after!==""  ? String(draft.knee.after===""?0:draft.knee.after)  : "–";
+  $$("#fKneeFlags button").forEach(b=>b.setAttribute("aria-pressed", String(!!draft.knee[b.dataset.v])));
+  $("#fKneeNote").value = draft.knee.note;
+
+  $("#fNote").value = draft.note;
+  $("#fBw").value = draft.bw; $("#fSleep").value = draft.sleep; $("#fRec").value = draft.rec;
+  $("#save").textContent = editingId ? "Päivitä treeni" : "Tallenna treeni";
+  const hint=$("#editHint");
+  hint.hidden = !editingId;
+  if(editingId) hint.textContent = "Muokkaat "+fiDate(draft.date)+" tallennettua treeniä.";
+  renderExos(); renderGrades();
+}
+function renderRecent(){
+  const host=$("#recent");
+  if(!mem.sessions.length){ host.innerHTML='<div class="empty">Ei vielä tallennettuja treenejä.</div>'; return; }
+  host.innerHTML = mem.sessions.slice(0,8).map(s=>{
+    const meta = s.type==="gym"
+      ? nkpl((s.exercises||[]).length,"liike","liikettä")+" · "+fmt(volumeOf(s))+" kg volyymia"
+      : (STYLE_LABEL[s.climb&&s.climb.style]||"Kiipeily")+" · "+nkpl(sendsOf(s),"läpimeno","läpimenoa");
+    const k = hasKnee(s) ? ' · polvi '+kneeShort(s.knee) : "";
+    return '<div class="item"><i class="tagdot '+(s.type==="gym"?"gym":"climb")+'"></i>'+
+      '<div class="grow"><b>'+esc(fiDate(s.date))+" "+esc(s.type==="gym"?"Sali":"Kiipeily")+'</b>'+
+      '<div class="meta">'+esc(meta+k)+'</div>'+
+      (s.note?'<div class="meta" style="color:var(--ink-3)">'+esc(s.note)+'</div>':"")+'</div>'+
+      '<button class="btn ghost" data-edit="'+s.id+'">Muokkaa</button></div>';
+  }).join("");
+}
+function kneeShort(k){
+  const p=[];
+  if(k.during!=null) p.push(k.during+"/10 aikana");
+  if(k.after!=null) p.push(k.after+"/10 jälkeen");
+  if(k.stiff) p.push("jäykkyys");
+  if(k.swell) p.push("turvotus");
+  return p.join(", ")||"merkitty";
+}
+
+/* --- liikevalitsin --- */
+function openSheet(){
+  $("#sheetBg").classList.add("on"); $("#sheet").classList.add("on");
+  $("#exSearch").value=""; renderExList(""); setTimeout(()=>$("#exSearch").focus(),50);
+}
+function closeSheet(){ $("#sheetBg").classList.remove("on"); $("#sheet").classList.remove("on"); }
+function renderExList(q){
+  q=q.trim().toLowerCase();
+  const groups=Object.assign({}, CATALOG);
+  const extra=allExerciseNames().filter(n=>!Object.values(CATALOG).some(a=>a.indexOf(n)>=0));
+  if(extra.length) groups["Omat liikkeet"]=extra;
+  let html="";
+  Object.keys(groups).forEach(cat=>{
+    const hits=groups[cat].filter(n=>n.toLowerCase().indexOf(q)>=0);
+    if(!hits.length) return;
+    html+='<div class="cat">'+esc(cat)+'</div>'+hits.map(n=>'<button data-pick="'+esc(n)+'">'+esc(n)+'</button>').join("");
+  });
+  if(q && !allExerciseNames().some(n=>n.toLowerCase()===q))
+    html='<div class="cat">Uusi liike</div><button data-pick="'+esc(q)+'" data-new="1">+ Lisää &bdquo;'+esc(q)+'&ldquo;</button>'+html;
+  if(!html) html='<div class="empty">Ei osumia.</div>';
+  $("#exList").innerHTML=html;
+}
+function addExercise(name){
+  name=String(name).trim(); if(!name) return;
+  let seed=[{reps:"",weight:"",rpe:""}];
+  for(const s of mem.sessions){
+    const e=(s.exercises||[]).find(x=>x.name===name);
+    if(e && e.sets && e.sets.length){ seed=e.sets.map(st=>({reps:st.reps, weight:st.weight, rpe:""})); break; }
+  }
+  draft.exercises.push({ name:name, kneeFlag:false, sets:seed });
+  if(!allExerciseNames().includes(name)) saveCustom(getCustom().concat([name]));
+  renderExos();
+}
+
+/* --- tallennus --- */
+function collect(){
+  draft.date = $("#fDate").value || todayStr();
+  draft.dur = $("#fDur").value;
+  draft.knee.note = $("#fKneeNote").value;
+  draft.note = $("#fNote").value;
+  draft.bw = $("#fBw").value; draft.sleep = $("#fSleep").value; draft.rec = $("#fRec").value;
+}
+async function save(){
+  collect();
+  if(draft.type==="gym" && !draft.exercises.length){ toast("Lisää vähintään yksi liike"); return; }
+  if(draft.type==="climb" && !draft.climb.style){ toast("Valitse kiipeilyn tyyppi"); return; }
+
+  const now=new Date().toISOString();
+  const existing = editingId ? mem.sessions.find(x=>x.id===editingId) : null;
+  const s = {
+    id: editingId || ("s"+Date.now().toString(36)+Math.random().toString(36).slice(2,6)),
+    date: draft.date, type: draft.type, dur: num(draft.dur)||0,
+    note: draft.note.trim(),
+    createdAt: existing ? existing.createdAt || now : now,
+    updatedAt: now
+  };
+
+  const kt = draft.kneeTouched || draft.knee.stiff || draft.knee.swell || (draft.knee.note||"").trim();
+  s.knee = kt ? {
+    during: draft.knee.during==="" ? null : num(draft.knee.during),
+    after:  draft.knee.after===""  ? null : num(draft.knee.after),
+    stiff: !!draft.knee.stiff, swell: !!draft.knee.swell,
+    note: (draft.knee.note||"").trim()
+  } : null;
+
+  if(draft.type==="gym"){
+    s.exercises = draft.exercises.map(e=>({
+      name:e.name, kneeFlag:!!e.kneeFlag,
+      sets:e.sets.filter(st=>num(st.reps)>0).map(st=>({reps:num(st.reps), weight:num(st.weight), rpe:st.rpe===""?0:num(st.rpe)}))
+    })).filter(e=>e.sets.length);
+    if(!s.exercises.length){ toast("Kirjaa vähintään yksi sarja"); return; }
+  } else {
+    const sends={}; Object.keys(draft.climb.sends).forEach(k=>{ if(draft.climb.sends[k]>0) sends[k]=draft.climb.sends[k]; });
+    s.climb = { style:draft.climb.style, sends:sends };
+  }
+
+  try{
+    await put("sessions", s);
+    if(draft.bw!=="" || draft.sleep!=="" || draft.rec!==""){
+      await dput(draft.date, {
+        bw: draft.bw===""?"":num(draft.bw),
+        sleep: draft.sleep===""?"":num(draft.sleep),
+        rec: draft.rec===""?"":num(draft.rec)
+      });
+    }
+    toast(editingId ? "Päivitetty" : "Tallennettu");
+    editingId=null; draft=blankDraft(); syncForm(); renderAll();
+    window.scrollTo({top:0, behavior:"smooth"});
+  }catch(e){ toast("Tallennus ei onnistunut"); }
+}
+function loadForEdit(id){
+  const s=mem.sessions.find(x=>x.id===id); if(!s) return;
+  editingId=id;
+  const d=dget(s.date)||{};
+  const k=s.knee||{};
+  draft={
+    date:s.date, type:s.type, dur:s.dur||"",
+    exercises:(s.exercises||[]).map(e=>({name:e.name, kneeFlag:!!e.kneeFlag, sets:e.sets.map(st=>({reps:st.reps, weight:st.weight, rpe:st.rpe||""}))})),
+    climb:{ style:(s.climb&&s.climb.style)||"", sends:Object.assign({},(s.climb&&s.climb.sends)||{}) },
+    knee:{ during:k.during==null?"":k.during, after:k.after==null?"":k.after, stiff:!!k.stiff, swell:!!k.swell, note:k.note||"" },
+    kneeTouched: hasKnee(s),
+    note:s.note||"", bw:d.bw==null?"":d.bw, sleep:d.sleep==null?"":d.sleep, rec:d.rec==null?"":d.rec
+  };
+  go("log"); syncForm(); window.scrollTo({top:0, behavior:"smooth"});
+}
+
+/* ============================================================
+   9. Kalenteri
+   ============================================================ */
+function stat(v,l){ return '<div class="stat"><div class="bignum num">'+v+'</div><div class="xs muted">'+l+'</div></div>'; }
+function renderCal(){
+  const V=view();
+  $("#calBanner").innerHTML = V.isDemo ? demoBanner() : "";
+  const y=calMonth.getFullYear(), m=calMonth.getMonth();
+  $("#calTitle").textContent = MONTHS[m][0].toUpperCase()+MONTHS[m].slice(1)+" "+y;
+  const first=new Date(y,m,1), lead=(first.getDay()+6)%7, dim=new Date(y,m+1,0).getDate();
+  const byDate={};
+  V.sessions.forEach(s=>{ (byDate[s.date]=byDate[s.date]||[]).push(s); });
+  let html=DOW.map(d=>'<div class="dow">'+d+'</div>').join("");
+  for(let i=0;i<lead;i++) html+='<div class="day empty"></div>';
+  for(let d=1;d<=dim;d++){
+    const key=iso(new Date(y,m,d)), list=byDate[key]||[];
+    const types=new Set(list.map(s=>s.type));
+    let dots=[...types].map(t=>'<i class="'+(t==="gym"?"gym":"climb")+'"></i>').join("");
+    if(list.some(s=>s.knee && (s.knee.stiff || s.knee.swell || (s.knee.during||0)>=4 || (s.knee.after||0)>=4))) dots+='<i class="knee"></i>';
+    html+='<button class="day'+(list.length?" has":"")+(key===todayStr()?" today":"")+'" data-day="'+key+'">'+d+'<span class="dots">'+dots+'</span></button>';
+  }
+  $("#calGrid").innerHTML=html;
+
+  const pre=y+"-"+String(m+1).padStart(2,"0");
+  const inMonth=V.sessions.filter(s=>s.date.slice(0,7)===pre);
+  const gym=inMonth.filter(s=>s.type==="gym"), climb=inMonth.filter(s=>s.type==="climb");
+  $("#calSummary").innerHTML =
+    '<div class="eyebrow">Kuukausi lyhyesti</div>'+
+    '<div class="statgrid" style="margin-top:10px">'+
+      stat(inMonth.length,"treeniä")+stat(gym.length,"salilla")+stat(climb.length,"kiipeillen")+
+      stat(fmt(gym.reduce((a,s)=>a+volumeOf(s),0)),"kg volyymia")+
+    '</div>';
+  $("#calDay").innerHTML="";
+}
+function renderDay(key){
+  const V=view();
+  const list=V.sessions.filter(s=>s.date===key);
+  const d=V.days[key]||{};
+  if(!list.length && !d.bw && !d.morningStiff){ $("#calDay").innerHTML=""; return; }
+  const dd=parseISO(key);
+  let html='<div class="card" style="margin-top:12px"><div class="eyebrow">'+esc(dd.getDate()+". "+MONTHS[dd.getMonth()]+" "+dd.getFullYear())+'</div>';
+  list.forEach(s=>{
+    html+='<div class="item" style="margin-top:4px"><i class="tagdot '+(s.type==="gym"?"gym":"climb")+'"></i><div class="grow">';
+    if(s.type==="gym"){
+      html+='<b>Salitreeni</b><div class="meta num">'+fmt(volumeOf(s))+' kg · '+(s.dur||"–")+' min</div>';
+      html+='<div class="small" style="margin-top:6px">'+(s.exercises||[]).map(e=>
+        '<div class="row" style="justify-content:space-between; gap:10px; padding:2px 0"><span>'+esc(e.name)+(e.kneeFlag?' <span class="chip warn sm" aria-pressed="true">polvi</span>':'')+'</span><span class="num muted">'+
+        e.sets.map(st=>num(st.reps)+"×"+fmt(num(st.weight),num(st.weight)%1?1:0)).join(", ")+'</span></div>').join("")+'</div>';
+    } else {
+      const sd=(s.climb&&s.climb.sends)||{};
+      html+='<b>'+esc(STYLE_LABEL[s.climb&&s.climb.style]||"Kiipeily")+'</b><div class="meta num">'+nkpl(sendsOf(s),"läpimeno","läpimenoa")+' · '+(s.dur||"–")+' min</div>';
+      html+='<div class="small num" style="margin-top:4px">'+Object.keys(sd).map(g=>esc(g)+"×"+sd[g]).join("  ")+'</div>';
+    }
+    if(hasKnee(s)) html+='<div class="meta" style="margin-top:5px">Polvi: '+esc(kneeShort(s.knee))+(s.knee.note?' · '+esc(s.knee.note):"")+'</div>';
+    if(s.note) html+='<div class="meta" style="color:var(--ink-3)">'+esc(s.note)+'</div>';
+    html+='</div>'+(V.isDemo?"":'<div style="display:flex; flex-direction:column; gap:2px"><button class="btn ghost" data-edit="'+s.id+'">Muokkaa</button><button class="btn danger" data-rm="'+s.id+'">Poista</button></div>')+'</div>';
+  });
+  if(d.bw||d.sleep||d.rec||d.morningStiff){
+    html+='<div class="item"><div class="grow"><b>Päivän mittarit</b><div class="meta num">'+
+      [d.bw?fmt(d.bw,1)+" kg":"", d.sleep?fmt(d.sleep,1)+" h unta":"", d.rec?"palautuminen "+d.rec+"/5":"", d.morningStiff?"aamujäykkyys "+d.morningStiff+"/5":""].filter(Boolean).join(" · ")+'</div></div></div>';
+  }
+  $("#calDay").innerHTML = html+'</div>';
+}
+
+/* ============================================================
+   10. Kehitys
+   ============================================================ */
+function renderProg(){
+  const V=view();
+  $("#progBanner").innerHTML = V.isDemo ? demoBanner() : "";
+  const now=new Date();
+
+  const weeks=[]; for(let i=13;i>=0;i--){ const d=new Date(now); d.setDate(d.getDate()-i*7); weeks.push(weekKey(d)); }
+  const volByWeek={}; weeks.forEach(w=>volByWeek[w]=0);
+  V.sessions.forEach(s=>{ const w=weekKey(parseISO(s.date)); if(w in volByWeek) volByWeek[w]+=volumeOf(s); });
+  const bars=weeks.map(w=>({label:"vko "+fiDate(w), short:fiDate(w).slice(0,-1), value:Math.round(volByWeek[w])}));
+  $("#volChart").innerHTML = svgBars(bars, "var(--accent)", "kg");
+  $("#volNow").textContent = fmt(bars[bars.length-1].value)+" kg";
+
+  const names={};
+  V.sessions.forEach(s=>(s.exercises||[]).forEach(e=>{ names[e.name]=(names[e.name]||0)+1; }));
+  const opts=Object.keys(names).sort((a,b)=>names[b]-names[a]);
+  const sel=$("#exSel"), keep=sel.value;
+  sel.innerHTML = opts.map(n=>'<option'+(n===keep?" selected":"")+'>'+esc(n)+'</option>').join("") || '<option>—</option>';
+  drawExChart(V, sel.value || opts[0]);
+
+  const mons=[]; for(let i=11;i>=0;i--){ const d=new Date(now.getFullYear(), now.getMonth()-i, 1); mons.push(iso(d).slice(0,7)); }
+  const cnt={}; mons.forEach(m=>cnt[m]=0);
+  V.sessions.forEach(s=>{ const m=s.date.slice(0,7); if(m in cnt) cnt[m]++; });
+  $("#monChart").innerHTML = svgBars(mons.map(m=>({label:m, short:MONTHS[+m.slice(5)-1].slice(0,3), value:cnt[m]})), "var(--rock)", "treeniä");
+
+  const bwPts=Object.keys(V.days).filter(k=>V.days[k].bw>0).sort().map(k=>({y:V.days[k].bw, label:fiDate(k), short:fiDate(k)}));
+  $("#bwChart").innerHTML = bwPts.length>1
+    ? svgLine(bwPts.slice(-40), "var(--ink-2)", "kg", 1)
+    : '<div class="empty">Kirjaa paino muutamana päivänä nähdäksesi käyrän.</div>';
+
+  renderPR(V);
+}
+function drawExChart(V, name){
+  if(!name){ $("#exChart").innerHTML='<div class="empty">Ei salitreenejä vielä.</div>'; return; }
+  const pts=V.sessions.filter(s=>(s.exercises||[]).some(e=>e.name===name))
+    .sort((a,b)=>a.date.localeCompare(b.date))
+    .map(s=>{
+      const e=s.exercises.find(x=>x.name===name);
+      const best=Math.max.apply(null, e.sets.map(st=>e1rm(st.weight,st.reps)).concat([0]));
+      return {y:Math.round(best*10)/10, label:fiDate(s.date), short:fiDate(s.date)};
+    }).filter(p=>p.y>0);
+  if(pts.length<2){ $("#exChart").innerHTML='<div class="empty">'+esc(name)+': tarvitaan vähintään kaksi kirjausta painolla.</div>'; return; }
+  const dl=pts[pts.length-1].y-pts[0].y;
+  $("#exChart").innerHTML = svgLine(pts.slice(-40), "var(--accent)", "kg", 1)+
+    '<div class="row xs" style="margin-top:8px; gap:8px"><span class="muted">'+esc(name)+'</span>'+
+    '<span class="delta'+(dl>0.5?"":(dl<-0.5?" down":" flat"))+'">'+(dl>0?"+":"")+fmt(dl,1)+' kg</span>'+
+    '<span class="muted">jaksolla '+esc(pts[0].short+"–"+pts[pts.length-1].short)+'</span></div>';
+}
+function renderPR(V){
+  const cutoff=iso(new Date(Date.now()-90*864e5));
+  const best={}, bestOld={};
+  V.sessions.forEach(s=>(s.exercises||[]).forEach(e=>e.sets.forEach(st=>{
+    const v=e1rm(st.weight,st.reps); if(!v) return;
+    const rec={v:v, reps:num(st.reps), w:num(st.weight), date:s.date};
+    if(!best[e.name] || v>best[e.name].v) best[e.name]=rec;
+    if(s.date<cutoff && (!bestOld[e.name] || v>bestOld[e.name].v)) bestOld[e.name]=rec;
+  })));
+  const rows=Object.keys(best).sort((a,b)=>best[b].v-best[a].v);
+  if(!rows.length) $("#prTable").innerHTML='<tbody><tr><td class="empty">Ei vielä painollisia sarjoja.</td></tr></tbody>';
+  else $("#prTable").innerHTML =
+    '<thead><tr><th>Liike</th><th>Paras sarja</th><th>e1RM</th><th>Δ 3 kk</th><th>Päivä</th></tr></thead><tbody>'+
+    rows.map(n=>{
+      const b=best[n], o=bestOld[n], dl=o?b.v-o.v:null;
+      const dd = dl==null ? '<span class="delta flat">uusi</span>'
+        : '<span class="delta'+(dl>0.5?"":(dl<-0.5?" down":" flat"))+'">'+(dl>0?"+":"")+fmt(dl,1)+'</span>';
+      return '<tr><td class="name">'+esc(n)+'</td><td class="n">'+b.reps+' × '+fmt(b.w,b.w%1?1:0)+' kg</td>'+
+        '<td class="n"><b>'+fmt(b.v,1)+'</b> kg</td><td>'+dd+'</td><td class="n muted">'+esc(fiDate(b.date))+'</td></tr>';
+    }).join("")+'</tbody>';
+
+  const byStyle={};
+  V.sessions.filter(s=>s.type==="climb").forEach(s=>{
+    const st=(s.climb&&s.climb.style)||"muu";
+    const list=st.indexOf("koysi")===0?ROUTE:BOULDER;
+    const o=byStyle[st]=byStyle[st]||{n:0,sends:0,hard:-1,hardDate:"",hardName:"",ninety:0};
+    o.n++;
+    const sd=(s.climb&&s.climb.sends)||{};
+    Object.keys(sd).forEach(g=>{
+      o.sends+=sd[g];
+      if(s.date>=cutoff) o.ninety+=sd[g];
+      const i=list.indexOf(g);
+      if(i>o.hard){ o.hard=i; o.hardDate=s.date; o.hardName=g; }
+    });
+  });
+  const ks=Object.keys(byStyle);
+  if(!ks.length) $("#climbTable").innerHTML='<tbody><tr><td class="empty">Ei vielä kiipeilysessioita.</td></tr></tbody>';
+  else $("#climbTable").innerHTML =
+    '<thead><tr><th>Tyyppi</th><th>Kovin</th><th>Sessioita</th><th>Läpimenot</th><th>Viim. 90 pv</th></tr></thead><tbody>'+
+    ks.map(k=>{ const o=byStyle[k];
+      return '<tr><td class="name">'+esc(STYLE_LABEL[k]||k)+'</td><td class="n"><b>'+esc(o.hardName||"–")+'</b>'+
+      (o.hardDate?' <span class="muted">'+esc(fiDate(o.hardDate))+'</span>':"")+'</td><td class="n">'+o.n+'</td><td class="n">'+o.sends+'</td><td class="n">'+o.ninety+'</td></tr>';
+    }).join("")+'</tbody>';
+}
+
+/* ============================================================
+   11. Polvi
+   ============================================================ */
+function renderKnee(){
+  const V=view();
+  $("#kneeBanner").innerHTML = V.isDemo ? demoBanner() : "";
+
+  const kneeSessions = V.sessions.filter(hasKnee).sort((a,b)=>a.date.localeCompare(b.date));
+
+  if(!kneeSessions.length){
+    $("#kneeStatus").innerHTML = '<div class="empty">Kirjaa polven tuntumaa treenin yhteydessä, niin näet kehityksen tässä.</div>';
+  } else {
+    const lastK=kneeSessions[kneeSessions.length-1];
+    const prevK=kneeSessions[kneeSessions.length-2];
+    const dv = (prevK && lastK.knee.during!=null && prevK.knee.during!=null) ? lastK.knee.during-prevK.knee.during : null;
+    const trend = dv==null ? '' :
+      '<span class="delta'+(dv<-0.5?"":(dv>0.5?" down":" flat"))+'">'+(dv>0?"+":"")+fmt(dv,0)+' vs. edellinen</span>';
+    $("#kneeStatus").innerHTML =
+      '<div class="eyebrow">Nykytila</div>'+
+      '<div class="row wrap" style="gap:18px; margin-top:10px; align-items:baseline">'+
+        '<div class="stat"><div class="bignum num">'+(lastK.knee.during==null?"–":lastK.knee.during)+'</div><div class="xs muted">kipu aikana</div></div>'+
+        '<div class="stat"><div class="bignum num">'+(lastK.knee.after==null?"–":lastK.knee.after)+'</div><div class="xs muted">kipu jälkeen</div></div>'+
+        '<div class="grow"></div>'+trend+
+      '</div>'+
+      '<div class="small muted" style="margin-top:10px">Viimeksi '+esc(fiDate(lastK.date))+
+        (lastK.knee.stiff?' · jäykkyyttä':'')+(lastK.knee.swell?' · turvotusta':'')+
+        (lastK.knee.note?' · '+esc(lastK.knee.note):'')+'</div>';
+  }
+
+  if(kneeSessions.length<2){
+    $("#kneePainChart").innerHTML = '<div class="empty">Vähintään kaksi kirjausta tarvitaan käyrään.</div>';
+    $("#kneeLoadChart").innerHTML = '<div class="empty">—</div>';
+  } else {
+    const labels = kneeSessions.map(s=>fiDate(s.date));
+    $("#kneePainChart").innerHTML = svgLines(labels, [
+      {name:"aikana", color:"var(--red)", ys:kneeSessions.map(s=>s.knee.during)},
+      {name:"jälkeen", color:"var(--amber)", ys:kneeSessions.map(s=>s.knee.after)}
+    ], {min:0, max:10});
+
+    const firstW=weekKey(parseISO(kneeSessions[0].date));
+    const lastW=weekKey(new Date());
+    const weeks=[]; let cur=parseISO(firstW), guard=0;
+    while(iso(cur)<=lastW && guard++<80){ weeks.push(iso(cur)); cur=new Date(cur.getFullYear(),cur.getMonth(),cur.getDate()+7); }
+    const volByWeek={}; weeks.forEach(w=>volByWeek[w]=0);
+    V.sessions.forEach(s=>{ const w=weekKey(parseISO(s.date)); if(w in volByWeek) volByWeek[w]+=volumeOf(s); });
+    $("#kneeLoadChart").innerHTML = svgBars(weeks.map(w=>({label:"vko "+fiDate(w), short:fiDate(w).slice(0,-1), value:Math.round(volByWeek[w])})), "var(--accent)", "kg");
+  }
+
+  const todayLog = dget(todayStr()) || {};
+  $$("#mStiffChips button").forEach(b=>b.setAttribute("aria-pressed", String(String(todayLog.morningStiff||"")===b.dataset.v)));
+  const stiffPts = Object.keys(V.days).filter(k=>V.days[k].morningStiff>0).sort().slice(-40)
+    .map(k=>({y:V.days[k].morningStiff, label:fiDate(k), short:fiDate(k)}));
+  $("#mStiffChart").innerHTML = stiffPts.length>1
+    ? svgLine(stiffPts, "var(--amber)", "/5", 0, [1,5])
+    : '<div class="empty">Kirjaa aamujäykkyys muutamana päivänä.</div>';
+
+  const aggr=kneeAggravators(V.sessions);
+  $("#kneeAggr").innerHTML = aggr.length
+    ? aggr.map(a=>'<div class="item"><div class="grow"><b>'+esc(a.name)+'</b><div class="meta">'+nkpl(a.n,"kerta","kertaa")+' · viimeksi '+esc(fiDate(a.last))+'</div></div></div>').join("")
+    : '<div class="empty">Ei merkintöjä. Kirjatessa paina liikkeen "Polvi oireili" jos jokin liike ärsytti polvea.</div>';
+
+  const notes = V.sessions.filter(s=>s.knee && (s.knee.note||"").trim())
+    .sort((a,b)=>b.date.localeCompare(a.date)).slice(0,12);
+  $("#kneeNotesList").innerHTML = notes.length
+    ? notes.map(s=>'<div class="item"><div class="grow"><b class="xs num">'+esc(fiDate(s.date))+'</b> <span class="small">'+esc(s.knee.note)+'</span></div></div>').join("")
+    : '<div class="empty">Ei polvimuistiinpanoja vielä.</div>';
+}
+async function setMorningStiff(v){
+  const cur=dget(todayStr())||{};
+  const nv = String(cur.morningStiff||"")===String(v) ? "" : num(v);
+  await dput(todayStr(), {morningStiff: nv});
+  renderKnee();
+  toast(nv? "Aamujäykkyys "+nv+"/5" : "Aamujäykkyys poistettu");
+}
+
+/* ============================================================
+   12. Data / varmuuskopiot
+   ============================================================ */
+function buildExport(){
+  return JSON.stringify({
+    app:"treenikirja", version:APP_VERSION, exportedAt:new Date().toISOString(),
+    sessions: mem.sessions,
+    dayLogs: mem.dayLogs,
+    customExercises: getCustom()
+  }, null, 2);
+}
+async function saveFile(name, text, mime){
+  if(window.showSaveFilePicker){
+    try{
+      const ext="."+name.split(".").pop();
+      const h=await window.showSaveFilePicker({ suggestedName:name, types:[{description:name, accept:{[mime]:[ext]}}] });
+      const w=await h.createWritable(); await w.write(text); await w.close();
+      return true;
+    }catch(e){
+      if(e && e.name==="AbortError") return false;
+    }
+  }
+  try{
+    const a=document.createElement("a");
+    const url=URL.createObjectURL(new Blob([text],{type:mime}));
+    a.href=url; a.download=name; document.body.appendChild(a); a.click();
+    setTimeout(()=>{ URL.revokeObjectURL(url); a.remove(); }, 500);
+    return true;
+  }catch(e){ return false; }
+}
+async function exportJSON(){
+  const ok=await saveFile("treenikirja-"+todayStr()+".json", buildExport(), "application/json");
+  if(ok){
+    await setMeta("lastBackup", {at:new Date().toISOString(), count:mem.sessions.length});
+    toast("Varmuuskopio tallennettu"); renderAll(); renderBackupInfo();
+  }
+}
+function csvText(){
+  const q=v=>{ v=v==null?"":String(v); return /[",\n]/.test(v) ? '"'+v.replace(/"/g,'""')+'"' : v; };
+  const head=["paiva","tyyppi","liike_tai_aste","sarja","toistot","paino_kg","rpe","e1rm_kg","liike_polvi_oireili","kesto_min","polvi_kipu_aikana","polvi_kipu_jalkeen","polvi_jaykkyys","polvi_turvotus","polvi_note","aamujaykkyys","kehonpaino_kg","uni_h","palautuminen","muistiinpano"];
+  const out=[head.join(",")];
+  const dmap=mapDays(mem.dayLogs);
+  mem.sessions.slice().sort((a,b)=>a.date.localeCompare(b.date)).forEach(s=>{
+    const d=dmap[s.date]||{}, k=s.knee||{};
+    const tail=[s.dur||"", k.during==null?"":k.during, k.after==null?"":k.after, k.stiff?"1":"", k.swell?"1":"", k.note||"", d.morningStiff||"", d.bw||"", d.sleep||"", d.rec||"", s.note||""];
+    if(s.type==="gym"){
+      (s.exercises||[]).forEach(e=>e.sets.forEach((st,i)=>{
+        out.push([s.date,"sali",e.name,i+1,num(st.reps),num(st.weight),st.rpe||"",Math.round(e1rm(st.weight,st.reps)*10)/10, e.kneeFlag?"1":""].concat(tail).map(q).join(","));
+      }));
+    } else {
+      const sd=(s.climb&&s.climb.sends)||{}, keys=Object.keys(sd);
+      if(!keys.length) out.push([s.date,"kiipeily",STYLE_LABEL[s.climb&&s.climb.style]||"","","","","","",""].concat(tail).map(q).join(","));
+      keys.forEach(g=>{
+        out.push([s.date,"kiipeily",(STYLE_LABEL[s.climb&&s.climb.style]||"")+" "+g,"",sd[g],"","","",""].concat(tail).map(q).join(","));
+      });
+    }
+  });
+  Object.keys(dmap).sort().forEach(kd=>{
+    if(!mem.sessions.some(s=>s.date===kd)){
+      const d=dmap[kd];
+      out.push([kd,"lepo","","","","","","","","","","","","","",d.morningStiff||"",d.bw||"",d.sleep||"",d.rec||"",""].map(q).join(","));
+    }
+  });
+  return out.join("\n");
+}
+async function exportCsv(){
+  if(!mem.sessions.length){ toast("Ei vielä omaa dataa vietäväksi"); return; }
+  await saveFile("treenikirja-"+todayStr()+".csv", "﻿"+csvText(), "text/csv");
+}
+async function importJSON(file){
+  let data;
+  try{ data=JSON.parse(await file.text()); }
+  catch(e){ toast("Tiedostoa ei voitu lukea"); return; }
+  if(!data || data.app!=="treenikirja" || !Array.isArray(data.sessions)){ toast("Ei kelvollinen Treenikirja-vienti"); return; }
+  const replace = confirm(
+    "Tuodaan "+data.sessions.length+" treeniä.\n\n"+
+    "OK = KORVAA nykyinen data tuodulla\n"+
+    "Peruuta = YHDISTÄ (tuodut lisätään tai päivittävät)"
+  );
+  try{
+    if(replace) await clearAll();
+    for(const s of data.sessions) await put("sessions", s);
+    for(const d of (data.dayLogs||[])) if(d && d.date) await put("dayLogs", d);
+    if(Array.isArray(data.customExercises)){
+      const merged = replace ? data.customExercises : Array.from(new Set(getCustom().concat(data.customExercises)));
+      await setMeta("customExercises", merged);
+    }
+    await loadAll();
+    editingId=null; draft=blankDraft(); syncForm();
+    toast("Tuotu: "+data.sessions.length+" treeniä");
+    go("log");
+  }catch(e){ toast("Tuonti epäonnistui"); }
+}
+function renderBackupInfo(){
+  const lb=metaGet("lastBackup", null);
+  const el=$("#backupInfo"); if(!el) return;
+  if(!lb){
+    el.innerHTML = mem.sessions.length
+      ? '<span style="color:var(--amber)">Ei vielä varmuuskopiota.</span> '+nkpl(mem.sessions.length,"treeni","treeniä")+' tallessa vain tässä laitteessa.'
+      : 'Ei vielä dataa.';
+    return;
+  }
+  const since = mem.sessions.length - (lb.count||0);
+  const ago = daysAgo(lb.at);
+  el.innerHTML = 'Viimeisin JSON-varmuuskopio <b>'+ago+' pv sitten</b>'+
+    (since>0 ? ' · <b>'+since+'</b> uutta treeniä sen jälkeen' : ' · ei uutta dataa sen jälkeen');
+}
+function backupNudge(){
+  const lb=metaGet("lastBackup", null);
+  if(!mem.sessions.length) return "";
+  let stale=false;
+  if(!lb) stale = mem.sessions.length>=BACKUP_NUDGE_SESSIONS;
+  else stale = (mem.sessions.length-(lb.count||0))>=BACKUP_NUDGE_SESSIONS || daysAgo(lb.at)>=BACKUP_NUDGE_DAYS;
+  if(!stale) return "";
+  const n = lb ? (mem.sessions.length-(lb.count||0)) : mem.sessions.length;
+  return '<div class="banner"><span>'+n+' treeniä ilman varmuuskopiota</span>'+
+    '<button class="btn" data-goto="data">Vie JSON</button></div>';
+}
+
+/* ============================================================
+   13. Tallennustila
+   ============================================================ */
+async function refreshStorageInfo(){
+  const el=$("#storageInfo"); if(!el) return;
+  let persisted=null, est=null;
+  try{ if(navigator.storage && navigator.storage.persisted) persisted=await navigator.storage.persisted(); }catch(e){}
+  try{ if(navigator.storage && navigator.storage.estimate) est=await navigator.storage.estimate(); }catch(e){}
+  let html = 'Tallennustapa: <b>'+(USE_LS?"localStorage (varajärjestelmä)":"IndexedDB")+'</b>';
+  html += '<br>Treenejä: <b>'+mem.sessions.length+'</b> · päivämerkintöjä: <b>'+mem.dayLogs.length+'</b>';
+  if(est && est.usage!=null){
+    const mb=(est.usage/1048576), q=(est.quota/1048576);
+    html += '<br>Käytetty: <b>'+fmt(mb,2)+' MB</b>'+(q?(' / '+fmt(q>1024?q/1024:q, q>1024?1:0)+(q>1024?' GB':' MB')):"");
+  }
+  if(persisted!=null){
+    html += '<br>Pysyvä tallennus: <b style="color:'+(persisted?"var(--accent)":"var(--amber)")+'">'+(persisted?"päällä":"ei myönnetty")+'</b>';
+    $("#reqPersist").hidden = persisted;
+  }
+  el.innerHTML=html;
+}
+async function requestPersist(){
+  try{
+    const g=await navigator.storage.persist();
+    toast(g?"Pysyvä tallennus päällä":"Selain ei myöntänyt pysyvää tallennusta");
+  }catch(e){ toast("Ei tuettu tässä selaimessa"); }
+  refreshStorageInfo();
+}
+async function wipeAll(){
+  if(!confirm("Poistetaanko KAIKKI treenidata tästä laitteesta? Tätä ei voi perua.")) return;
+  if(!confirm("Vahvista vielä: kaikki treenit, päiväkirjamerkinnät ja omat liikkeet poistetaan.")) return;
+  await clearAll(); await loadAll();
+  editingId=null; draft=blankDraft(); DEMO=null; syncForm();
+  toast("Kaikki data poistettu"); go("log");
+}
+
+/* ============================================================
+   14. Navigointi
+   ============================================================ */
+function go(v){
+  if(v!=="data") prevView=v;
+  current=v;
+  $$(".view").forEach(s=>s.classList.toggle("on", s.id==="v-"+v));
+  $$("#tabs button").forEach(b=>b.setAttribute("aria-current", String(b.dataset.view===v)));
+  renderAll();
+  if(v==="data"){ renderBackupInfo(); refreshStorageInfo(); }
+  window.scrollTo({top:0});
+}
+function renderAll(){
+  renderRecent();
+  $("#logBanner").innerHTML = backupNudge();
+  if(current==="log") renderExos();
+  if(current==="cal") renderCal();
+  if(current==="prog") renderProg();
+  if(current==="knee") renderKnee();
+}
+
+/* ============================================================
+   15. Tapahtumat
+   ============================================================ */
+$("#tabs").addEventListener("click", e=>{ const b=e.target.closest("button[data-view]"); if(b) go(b.dataset.view); });
+$("#openData").addEventListener("click", ()=>go("data"));
+$("#dataBack").addEventListener("click", ()=>go(prevView));
+document.addEventListener("click", e=>{ const g=e.target.closest("[data-goto]"); if(g) go(g.dataset.goto); });
+
+$("#fType").addEventListener("click", e=>{ const b=e.target.closest("button"); if(!b) return; draft.type=b.dataset.t; syncForm(); });
+$("#cStyle").addEventListener("click", e=>{
+  const b=e.target.closest("button"); if(!b) return;
+  draft.climb.style = draft.climb.style===b.dataset.v ? "" : b.dataset.v;
+  syncForm();
+});
+$("#fKneeFlags").addEventListener("click", e=>{
+  const b=e.target.closest("button"); if(!b) return;
+  draft.knee[b.dataset.v] = !draft.knee[b.dataset.v];
+  draft.kneeTouched = true;
+  syncForm();
+});
+$("#fKDuring").addEventListener("input", e=>{ draft.knee.during=e.target.value; draft.kneeTouched=true; $("#kDuringOut").textContent=e.target.value; });
+$("#fKAfter").addEventListener("input", e=>{ draft.knee.after=e.target.value; draft.kneeTouched=true; $("#kAfterOut").textContent=e.target.value; });
+
+const grades=$("#cGrades");
+let pressT=null;
+grades.addEventListener("click", e=>{
+  const b=e.target.closest(".grade"); if(!b) return;
+  draft.climb.sends[b.dataset.g]=(draft.climb.sends[b.dataset.g]||0)+1;
+  renderGrades();
+});
+grades.addEventListener("contextmenu", e=>{
+  const b=e.target.closest(".grade"); if(!b) return;
+  e.preventDefault(); delete draft.climb.sends[b.dataset.g]; renderGrades();
+});
+grades.addEventListener("pointerdown", e=>{
+  const b=e.target.closest(".grade"); if(!b) return;
+  const g=b.dataset.g;
+  pressT=setTimeout(()=>{ delete draft.climb.sends[g]; renderGrades(); pressT=null; }, 550);
+});
+["pointerup","pointerleave","pointercancel"].forEach(ev=>grades.addEventListener(ev, ()=>clearTimeout(pressT)));
+
+$("#exos").addEventListener("click", e=>{
+  const q=e.target.closest("[data-quick]");
+  if(q){ addExercise(q.dataset.quick); return; }
+  const rep=e.target.closest("[data-repeat]");
+  if(rep){
+    const src=mem.sessions.find(x=>x.id===rep.dataset.repeat);
+    if(src){ draft.exercises=src.exercises.map(x=>({name:x.name, kneeFlag:false, sets:x.sets.map(st=>({reps:st.reps, weight:st.weight, rpe:""}))})); renderExos(); }
+    return;
+  }
+  const kf=e.target.closest("[data-knee-ex]");
+  if(kf){ const i=+kf.dataset.kneeEx; draft.exercises[i].kneeFlag=!draft.exercises[i].kneeFlag; renderExos(); return; }
+  const add=e.target.closest("[data-add-set]"), dx=e.target.closest("[data-del-ex]"), ds=e.target.closest("[data-del-set]");
+  if(add){ const i=+add.dataset.addSet, sets=draft.exercises[i].sets, l=sets[sets.length-1]||{reps:"",weight:"",rpe:""};
+    sets.push({reps:l.reps, weight:l.weight, rpe:l.rpe}); renderExos(); return; }
+  if(dx){ draft.exercises.splice(+dx.dataset.delEx,1); renderExos(); return; }
+  if(ds){ const p=ds.dataset.delSet.split(":"), sets=draft.exercises[+p[0]].sets;
+    if(sets.length>1) sets.splice(+p[1],1); else draft.exercises.splice(+p[0],1);
+    renderExos(); return; }
+});
+$("#exos").addEventListener("input", e=>{
+  const t=e.target; if(t.dataset.f==null) return;
+  draft.exercises[+t.dataset.e].sets[+t.dataset.s][t.dataset.f]=t.value;
+});
+
+$("#addEx").addEventListener("click", openSheet);
+$("#sheetClose").addEventListener("click", closeSheet);
+$("#sheetBg").addEventListener("click", closeSheet);
+$("#exSearch").addEventListener("input", e=>renderExList(e.target.value));
+$("#exSearch").addEventListener("keydown", e=>{ if(e.key==="Enter"){ const v=e.target.value.trim(); if(v){ addExercise(v); closeSheet(); } } });
+$("#exList").addEventListener("click", e=>{ const b=e.target.closest("[data-pick]"); if(!b) return; addExercise(b.dataset.pick); closeSheet(); });
+document.addEventListener("keydown", e=>{ if(e.key==="Escape") closeSheet(); });
+
+$("#save").addEventListener("click", save);
+$("#reset").addEventListener("click", ()=>{ editingId=null; draft=blankDraft(); syncForm(); toast("Tyhjennetty"); });
+$("#fDate").addEventListener("change", e=>{
+  draft.date=e.target.value;
+  if(!editingId){
+    const d=dget(draft.date)||{};
+    $("#fBw").value=d.bw==null?"":d.bw; $("#fSleep").value=d.sleep==null?"":d.sleep; $("#fRec").value=d.rec==null?"":d.rec;
+    draft.bw=$("#fBw").value; draft.sleep=$("#fSleep").value; draft.rec=$("#fRec").value;
+  }
+});
+
+$("#mStiffChips").addEventListener("click", e=>{ const b=e.target.closest("button"); if(b) setMorningStiff(b.dataset.v); });
+
+document.addEventListener("click", async e=>{
+  const ed=e.target.closest("[data-edit]"); if(ed){ loadForEdit(ed.dataset.edit); return; }
+  const rm=e.target.closest("[data-rm]");
+  if(rm){ if(confirm("Poistetaanko tämä treeni?")){ await del("sessions", rm.dataset.rm); toast("Poistettu"); renderAll(); } return; }
+  const day=e.target.closest("[data-day]"); if(day){ renderDay(day.dataset.day); return; }
+});
+
+$("#calPrev").addEventListener("click", ()=>{ calMonth=new Date(calMonth.getFullYear(), calMonth.getMonth()-1, 1); renderCal(); });
+$("#calNext").addEventListener("click", ()=>{ calMonth=new Date(calMonth.getFullYear(), calMonth.getMonth()+1, 1); renderCal(); });
+$("#exSel").addEventListener("change", e=>drawExChart(view(), e.target.value));
+
+$("#expJson").addEventListener("click", exportJSON);
+$("#expCsv").addEventListener("click", exportCsv);
+$("#impJson").addEventListener("change", e=>{ const f=e.target.files[0]; if(f) importJSON(f); e.target.value=""; });
+$("#reqPersist").addEventListener("click", requestPersist);
+$("#wipe").addEventListener("click", wipeAll);
+
+/* ============================================================
+   16. Käynnistys
+   ============================================================ */
+async function registerSW(){
+  if(location.protocol==="https:" && "serviceWorker" in navigator){
+    try{ await navigator.serviceWorker.register("./sw.js"); }catch(e){}
+  }
+}
+async function boot(){
+  $("#verLine").textContent = "versio "+APP_VERSION;
+  try{ _db=await openDB(); }
+  catch(e){ USE_LS=true; }
+  try{ await loadAll(); }
+  catch(e){ USE_LS=true; try{ await loadAll(); }catch(e2){} }
+
+  if(USE_LS) setStatus("Varajärjestelmä käytössä (localStorage) — vie JSON-varmuuskopio usein", "warn");
+  else setStatus("Data tallessa tässä laitteessa (IndexedDB)");
+
+  syncForm();
+  renderCal(); renderProg(); renderKnee(); renderRecent();
+  renderAll();
+
+  try{
+    if(navigator.storage && navigator.storage.persisted){
+      const p=await navigator.storage.persisted();
+      if(!p && navigator.storage.persist) await navigator.storage.persist();
+    }
+  }catch(e){}
+  refreshStorageInfo();
+  registerSW();
+}
+boot();
+})();
+</script>
+</body>
+</html>

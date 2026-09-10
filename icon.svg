@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="Treenikirja">
+  <rect width="512" height="512" rx="112" fill="#4F7A28"/>
+  <g stroke="#FFFFFF" stroke-linecap="round" fill="none">
+    <!-- barbell bar -->
+    <line x1="150" y1="212" x2="362" y2="212" stroke-width="26"/>
+    <!-- inner collars -->
+    <line x1="150" y1="188" x2="150" y2="236" stroke-width="26"/>
+    <line x1="362" y1="188" x2="362" y2="236" stroke-width="26"/>
+    <!-- outer plates -->
+    <line x1="120" y1="170" x2="120" y2="254" stroke-width="30"/>
+    <line x1="392" y1="170" x2="392" y2="254" stroke-width="30"/>
+  </g>
+  <!-- knee-rehab pulse line -->
+  <path d="M104 330 H190 l24 -54 30 118 26 -78 20 36 h172"
+        fill="none" stroke="#D9EFC4" stroke-width="20"
+        stroke-linecap="round" stroke-linejoin="round"/>
+</svg>
