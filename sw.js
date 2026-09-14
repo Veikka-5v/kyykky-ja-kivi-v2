@@ -1,6 +1,6 @@
 /* Treenikirja – service worker
    Offline-first app shell cache. Bump CACHE when any shell file changes. */
-const CACHE = "treenikirja-v1";
+const CACHE = "treenikirja-v2";
 const ASSETS = [
   "./",
   "./index.html",
