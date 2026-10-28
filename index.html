@@ -18,6 +18,7 @@
   --amber:#A9701A; --amber-soft:#F5E7CE;
   --red:#A3342A; --red-soft:#F0D9D6;
   --shadow:0 1px 2px rgba(20,24,26,.06), 0 6px 18px -12px rgba(20,24,26,.28);
+  --on-accent:#FFFFFF;
   --r:12px; --r-s:8px;
   color-scheme:light;
 }
@@ -30,6 +31,7 @@
     --amber:#D9A653; --amber-soft:#302517;
     --red:#E38375; --red-soft:#31201D;
     --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 22px -14px rgba(0,0,0,.7);
+    --on-accent:#0F1312;
     color-scheme:dark;
   }
 }
@@ -41,9 +43,11 @@
   --amber:#D9A653; --amber-soft:#302517;
   --red:#E38375; --red-soft:#31201D;
   --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 22px -14px rgba(0,0,0,.7);
+  --on-accent:#0F1312;
   color-scheme:dark;
 }
 *{box-sizing:border-box}
+[hidden]{display:none!important}
 html{-webkit-text-size-adjust:100%}
 body{
   margin:0; background:var(--paper); color:var(--ink);
@@ -173,7 +177,7 @@ input[type=range]::-moz-range-thumb{width:22px; height:22px; border:3px solid va
 .day .dots i{width:5px; height:5px; border-radius:50%; display:block}
 .day i.gym{background:var(--accent)}
 .day i.climb{background:var(--rock)}
-.day i.knee{background:var(--amber)}
+.day i.ail{background:var(--amber)}
 
 .bignum{font-size:26px; font-weight:700; line-height:1.05; font-variant-numeric:tabular-nums}
 .statgrid{display:flex; flex-wrap:wrap; gap:20px}
@@ -207,7 +211,7 @@ td.name{white-space:normal; font-weight:600}
 .sheet-body{overflow-y:auto; -webkit-overflow-scrolling:touch; flex:1 1 auto; min-height:0; padding:12px 14px 22px}
 /* Erota liikelista/kiipeilyosio seuraavasta kortista, jotta "+ Lisää liike"
    ei näytä kuuluvan Polvi-korttiin. */
-#gymPane, #climbPane{margin-bottom:12px}
+#gymPane, #climbPane, #ailCard:not(:empty){margin-bottom:12px}
 
 .exlist{display:flex; flex-direction:column}
 .exlist button{text-align:left; background:none; border:0; border-bottom:1px solid var(--line); padding:12px 2px; font-size:14px; color:var(--ink)}
@@ -215,6 +219,37 @@ td.name{white-space:normal; font-weight:600}
 
 .toast{position:fixed; left:50%; transform:translateX(-50%); bottom:calc(76px + env(safe-area-inset-bottom)); z-index:60; background:var(--ink); color:var(--paper); font-size:13px; font-weight:600; padding:9px 16px; border-radius:999px; opacity:0; pointer-events:none; transition:opacity .18s; max-width:90vw; text-align:center}
 .toast.on{opacity:1}
+
+/* ---------- vaivaseuranta ---------- */
+.ail{padding:12px 0; border-top:1px solid var(--line)}
+.ail:first-of-type{border-top:0; padding-top:6px}
+.ail-head{display:flex; align-items:center; gap:8px}
+.ail-name{font-weight:700; font-size:14px; flex:1; min-width:0}
+.ail-val{min-width:34px; text-align:center; font-weight:700; font-size:13px; border-radius:999px; padding:2px 8px; background:var(--surface-2); color:var(--ink-3); border:1px solid var(--line); font-variant-numeric:tabular-nums}
+.ail-val.v-ok{background:var(--accent-soft); color:var(--accent-ink); border-color:var(--accent)}
+.ail-val.v-mid{background:var(--amber-soft); color:var(--amber); border-color:var(--amber)}
+.ail-val.v-bad{background:var(--red-soft); color:var(--red); border-color:var(--red)}
+.scale{display:grid; grid-template-columns:repeat(11,minmax(0,1fr)); gap:3px; margin-top:9px}
+.scale button{border:1px solid var(--line); background:var(--surface-2); color:var(--ink-3); border-radius:6px; height:38px; font-size:12px; font-weight:700; padding:0; font-variant-numeric:tabular-nums}
+.scale button[aria-pressed="true"]{background:var(--accent); border-color:var(--accent); color:var(--on-accent); font-size:14px}
+.scale button.mid[aria-pressed="true"]{background:var(--amber); border-color:var(--amber)}
+.scale button.bad[aria-pressed="true"]{background:var(--red); border-color:var(--red)}
+.scale-legend{display:flex; justify-content:space-between; font-size:10px; color:var(--ink-3); margin-top:4px}
+.ail-more{margin-top:10px; padding-top:10px; border-top:1px dashed var(--line)}
+.disclose{background:none; border:0; color:var(--accent-ink); font-size:12px; font-weight:700; padding:7px 0 0}
+.flagpick{margin:0 12px; padding:9px 0 2px}
+.cfg-row{display:flex; align-items:center; gap:10px; padding:12px 0; border-top:1px solid var(--line)}
+.cfg-row:first-child{border-top:0}
+.cfg-name{font-weight:700; font-size:14px}
+.cfg-sub{font-size:12px; color:var(--ink-3)}
+.switch{width:44px; height:26px; border-radius:999px; background:var(--line-2); border:0; position:relative; flex:none; padding:0; transition:background .15s}
+.switch[aria-checked="true"]{background:var(--accent)}
+.switch i{position:absolute; top:3px; left:3px; width:20px; height:20px; border-radius:50%; background:#fff; box-shadow:var(--shadow); transition:transform .15s}
+.switch[aria-checked="true"] i{transform:translateX(18px)}
+.editpanel{background:var(--surface-2); border:1px solid var(--line); border-radius:var(--r-s); padding:12px; margin:0 0 12px}
+.checkrow{display:flex; align-items:center; gap:9px; padding:7px 0; font-size:13px; color:var(--ink)}
+.checkrow input{width:18px; height:18px; accent-color:var(--accent); flex:none; margin:0}
+.note{font-size:12px; color:var(--ink-2); background:var(--surface-2); border-left:3px solid var(--accent); border-radius:0 var(--r-s) var(--r-s) 0; padding:9px 11px; margin-top:12px}
 
 @media (min-width:760px){
   .wrap{padding-bottom:24px}
@@ -232,7 +267,7 @@ td.name{white-space:normal; font-weight:600}
 <div class="wrap">
   <header class="top">
     <div class="brand">Treeni<span>kirja</span></div>
-    <button class="gear" id="openData"><svg viewBox="0 0 24 24"><path d="M12 15a3 3 0 100-6 3 3 0 000 6z"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 11-2.83 2.83l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 11-2.83-2.83l.06-.06A1.65 1.65 0 004.6 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 112.83-2.83l.06.06A1.65 1.65 0 009 4.6a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 112.83 2.83l-.06.06A1.65 1.65 0 0019.4 9c.2.63.77 1.05 1.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>Data</button>
+    <button class="gear" id="openData"><svg viewBox="0 0 24 24"><path d="M12 15a3 3 0 100-6 3 3 0 000 6z"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 11-2.83 2.83l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 11-2.83-2.83l.06-.06A1.65 1.65 0 004.6 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 112.83-2.83l.06.06A1.65 1.65 0 009 4.6a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 112.83 2.83l-.06.06A1.65 1.65 0 0019.4 9c.2.63.77 1.05 1.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>Asetukset</button>
     <div class="status"><span class="dot" id="stDot"></span><span id="stText">Ladataan…</span></div>
   </header>
 
@@ -240,7 +275,7 @@ td.name{white-space:normal; font-weight:600}
     <button data-view="log" aria-current="true"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>Kirjaa</button>
     <button data-view="cal"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg>Kalenteri</button>
     <button data-view="prog"><svg viewBox="0 0 24 24"><path d="M4 19V5M4 19h16M8 15l4-5 3 3 5-7"/></svg>Kehitys</button>
-    <button data-view="knee"><svg viewBox="0 0 24 24"><path d="M3 12h4l3 8 4-16 3 8h4"/></svg>Polvi</button>
+    <button data-view="ail"><svg viewBox="0 0 24 24"><path d="M3 12h4l3 8 4-16 3 8h4"/></svg>Vaivat</button>
   </nav>
 
   <!-- ============ KIRJAA ============ -->
@@ -251,10 +286,22 @@ td.name{white-space:normal; font-weight:600}
         <label class="field grow">Päivä
           <input type="date" id="fDate">
         </label>
-        <label class="field" style="width:116px">Kesto (min)
-          <input type="number" id="fDur" min="0" step="5" inputmode="numeric" placeholder="—">
+        <label class="field grow">Kesto
+          <select id="fDur">
+            <option value="">—</option>
+            <option value="30">30 min</option>
+            <option value="60">1 h</option>
+            <option value="90">1 h 30 min</option>
+            <option value="120">2 h</option>
+            <option value="150">2 h 30 min</option>
+            <option value="180">3 h</option>
+            <option value="muu">Muu…</option>
+          </select>
         </label>
       </div>
+      <label class="field" id="durOtherWrap" style="margin-top:10px" hidden>Kesto minuutteina
+        <input type="number" id="fDurOther" min="0" step="5" inputmode="numeric" placeholder="esim. 75">
+      </label>
       <div class="seg" style="margin-top:12px" id="fType">
         <button data-t="gym" aria-pressed="true">Salitreeni</button>
         <button data-t="climb" aria-pressed="false">Kiipeily</button>
@@ -286,25 +333,7 @@ td.name{white-space:normal; font-weight:600}
       </div>
     </div>
 
-    <div class="card">
-      <div class="eyebrow">Polvi</div>
-      <label class="field slider" style="margin-top:12px">
-        <span class="row"><span class="grow">Kipu treenin aikana (0–10)</span><b class="num" id="kDuringOut">–</b></span>
-        <input type="range" min="0" max="10" step="1" id="fKDuring" value="0">
-      </label>
-      <label class="field slider" style="margin-top:14px">
-        <span class="row"><span class="grow">Kipu treenin jälkeen (0–10)</span><b class="num" id="kAfterOut">–</b></span>
-        <input type="range" min="0" max="10" step="1" id="fKAfter" value="0">
-      </label>
-      <div class="chips" style="margin-top:14px" id="fKneeFlags">
-        <button class="chip warn" data-v="stiff" aria-pressed="false">Jäykkyyttä</button>
-        <button class="chip warn" data-v="swell" aria-pressed="false">Turvotusta</button>
-      </div>
-      <label class="field" style="margin-top:12px">Polvimuistiinpano
-        <input type="text" id="fKneeNote" placeholder="esim. jäykkä alussa, ei kipua kyykyssä">
-      </label>
-      <div class="xs muted" style="margin-top:8px">Merkitse yksittäinen liike liikkeen "Polvi oireili" -napista jos juuri se ärsytti polvea.</div>
-    </div>
+    <div id="ailCard"></div>
 
     <div class="card">
       <div class="eyebrow">Päivän mittarit</div>
@@ -354,7 +383,7 @@ td.name{white-space:normal; font-weight:600}
       <div class="row wrap xs muted" style="margin-top:12px; gap:14px">
         <span class="row" style="gap:5px"><i class="tagdot gym" style="margin:0"></i> Sali</span>
         <span class="row" style="gap:5px"><i class="tagdot climb" style="margin:0"></i> Kiipeily</span>
-        <span class="row" style="gap:5px"><i class="tagdot" style="margin:0;background:var(--amber)"></i> Polvi oireili</span>
+        <span class="row" style="gap:5px"><i class="tagdot" style="margin:0;background:var(--amber)"></i> Vaiva oireili</span>
       </div>
     </div>
     <div class="card" id="calSummary"></div>
@@ -408,45 +437,11 @@ td.name{white-space:normal; font-weight:600}
     </div>
   </section>
 
-  <!-- ============ POLVI ============ -->
-  <section class="view" id="v-knee">
-    <div id="kneeBanner"></div>
-    <div class="card" id="kneeStatus"></div>
-
-    <div class="card">
-      <div class="eyebrow">Kipukäyrä</div>
-      <div class="xs muted" style="margin:3px 0 6px">Treeneittäin, 0 = ei kipua</div>
-      <div id="kneePainChart"></div>
-    </div>
-
-    <div class="card">
-      <div class="eyebrow">Kuorma vs. oireet</div>
-      <div class="xs muted" style="margin:3px 0 6px">Salin viikkovolyymi samalta ajalta — vertaa kipukäyrään</div>
-      <div id="kneeLoadChart"></div>
-    </div>
-
-    <div class="card">
-      <div class="eyebrow">Aamujäykkyys</div>
-      <div class="xs muted" style="margin:3px 0 8px">Kirjaa herätessä, ei tarvitse kirjata treeniä</div>
-      <div class="row wrap" style="gap:6px" id="mStiffChips">
-        <button class="chip warn" data-v="1" aria-pressed="false">1 · notkea</button>
-        <button class="chip warn" data-v="2" aria-pressed="false">2</button>
-        <button class="chip warn" data-v="3" aria-pressed="false">3</button>
-        <button class="chip warn" data-v="4" aria-pressed="false">4</button>
-        <button class="chip warn" data-v="5" aria-pressed="false">5 · jäykkä</button>
-      </div>
-      <div id="mStiffChart" style="margin-top:12px"></div>
-    </div>
-
-    <div class="card">
-      <div class="eyebrow">Liikkeet jotka ovat oireilleet</div>
-      <div id="kneeAggr" style="margin-top:8px"></div>
-    </div>
-
-    <div class="card">
-      <div class="eyebrow">Polvimuistiinpanot</div>
-      <div id="kneeNotesList" style="margin-top:4px"></div>
-    </div>
+  <!-- ============ VAIVAT ============ -->
+  <section class="view" id="v-ail">
+    <div id="ailBanner"></div>
+    <div id="ailPicker"></div>
+    <div id="ailBody"></div>
   </section>
 
   <!-- ============ DATA ============ -->
@@ -454,11 +449,36 @@ td.name{white-space:normal; font-weight:600}
     <button class="btn ghost" id="dataBack" style="margin-bottom:6px">‹ Takaisin</button>
 
     <div class="card">
+      <div class="row">
+        <div class="grow">
+          <div class="cfg-name">Vaivaseuranta kirjauksessa</div>
+          <div class="cfg-sub" id="ailMasterSub"></div>
+        </div>
+        <button class="switch" id="ailMaster" role="switch" aria-checked="true" aria-label="Vaivaseuranta kirjauksessa"><i></i></button>
+      </div>
+      <div class="note">Pois päältä vaivaosio katoaa kirjaussivulta. Vaivat-välilehti ja kaikki aiemmat merkinnät säilyvät — mitään ei poisteta.</div>
+    </div>
+
+    <div class="card">
+      <div class="row" style="margin-bottom:2px">
+        <div class="eyebrow grow">Seurattavat vaivat</div>
+        <span class="xs muted" id="ailCount"></span>
+      </div>
+      <div id="ailCfgList"></div>
+      <button class="btn block" id="ailAddBtn" style="margin-top:12px">+ Lisää vaiva</button>
+      <div id="ailAddPanel" style="margin-top:12px" hidden></div>
+    </div>
+
+    <div class="card">
       <div class="eyebrow">Varmuuskopio</div>
       <div class="small" id="backupInfo" style="margin:6px 0 12px"></div>
       <button class="btn primary block" id="expJson">Vie JSON-varmuuskopio</button>
-      <button class="btn block" id="expCsv" style="margin-top:8px">Vie CSV (Sheets / Excel)</button>
-      <div class="xs muted" style="margin-top:10px">JSON sisältää kaiken ja voidaan tuoda takaisin. Vie se säännöllisesti esim. Drive-kansioon.</div>
+      <div class="row" style="gap:8px; margin-top:8px">
+        <button class="btn grow" id="expCsv" style="border-radius:var(--r-s); padding:12px">Treenit CSV</button>
+        <button class="btn grow" id="expCsvAil" style="border-radius:var(--r-s); padding:12px">Vaivat CSV</button>
+      </div>
+      <div class="xs muted" style="margin-top:10px">JSON sisältää kaiken ja voidaan tuoda takaisin. Vie se säännöllisesti esim. Drive-kansioon.<br>
+      CSV:t ovat analyysiä varten: treenit-tiedostossa yksi rivi per sarja, vaivat-tiedostossa yksi rivi per merkintä. Ne yhdistyvät päivämäärän kautta.</div>
     </div>
 
     <div class="card">
@@ -504,7 +524,19 @@ td.name{white-space:normal; font-weight:600}
 /* ============================================================
    1. Vakiot
    ============================================================ */
-const APP_VERSION = 1;
+const APP_VERSION = 2;
+/* Vaivaseuranta. Versiossa 1 seurattiin vain polvea; sen data muunnetaan
+   lukuhetkellä vaivaksi, jonka id on "polvi" (ks. normSession). */
+const POLVI_ID = "polvi";
+const POLVI_DEFAULT = { id:POLVI_ID, name:"Polvi", on:true, f:{after:true, stiff:true, swell:true, morning:true} };
+const AIL_SUGGEST = ["Polvi","Selkä","Olkapää","Kyynärpää","Ranne","Sormi","Nilkka","Lonkka","Niska"];
+const AIL_FIELDS = [
+  ["after",   "Kipu treenin jälkeen"],
+  ["stiff",   "Jäykkyys"],
+  ["swell",   "Turvotus"],
+  ["morning", "Aamujäykkyys (kirjataan Vaivat-välilehdellä)"]
+];
+const DUR_OPTS = ["30","60","90","120","150","180"];
 const CATALOG = {
   "Jalat": ["Kyykky","Etukyykky","Jalkaprässi","Maastaveto","Romanialainen maastaveto","Askelkyykky","Bulgarialainen askelkyykky","Yhden jalan kyykky penkille","Jalan ojennus","Jalan koukistus","Nordic hamstring","Lonkan ojennus (hip thrust)","Pohjenousu","Askelnousu"],
   "Kuntoutus & polvi": ["Terminaalinen polven ojennus","Jalan ojennus (kevyt)","Etureiden isometria seinää vasten","Askelnousu matala","Simpukka (clamshell)","Lonkan loitonnus kyljellään","Tasapaino yhdellä jalalla","Pohjenousu yhdellä jalalla","Copenhagen plank","Kävelylenkki"],
@@ -589,7 +621,47 @@ async function loadAll(){
     mem.dayLogs  = await idbAll("dayLogs");
     mem.meta     = await idbAll("meta");
   }
+  mem.sessions.forEach(normSession);
+  mem.dayLogs.forEach(normDay);
   sortSessions();
+}
+
+/* Version 1 -> 2 -muunnos. Ajetaan muistissa jokaisella latauksella ja
+   JSON-tuonnissa; tallennettua dataa ei kirjoiteta massana uusiksi. Uusi muoto
+   päätyy levylle vasta kun treeni tallennetaan seuraavan kerran. Muunnos on
+   häviötön ja idempotentti: jo uudessa muodossa olevaan dataan se ei koske.
+     session.knee {during,after,stiff,swell,note} -> session.ail.polvi {pain,after,stiff,swell,note}
+     exercise.kneeFlag true                       -> exercise.flags ["polvi"]
+     dayLog.morningStiff 1–5                      -> dayLog.morning.polvi 1–5            */
+function normSession(s){
+  if(!s || typeof s!=="object") return s;
+  if(!s.ail || typeof s.ail!=="object") s.ail={};
+  if(s.knee!==undefined){
+    const k=s.knee;
+    if(k && (k.during!=null || k.after!=null || k.stiff || k.swell || (k.note&&String(k.note).trim())) && !s.ail[POLVI_ID]){
+      s.ail[POLVI_ID]={ n:"Polvi",
+        pain:  k.during==null?null:num(k.during),
+        after: k.after==null?null:num(k.after),
+        stiff: !!k.stiff, swell: !!k.swell, note: String(k.note||"").trim() };
+    }
+    delete s.knee;
+  }
+  (s.exercises||[]).forEach(e=>{
+    if(!Array.isArray(e.flags)) e.flags=[];
+    if(e.kneeFlag!==undefined){
+      if(e.kneeFlag && e.flags.indexOf(POLVI_ID)<0) e.flags.push(POLVI_ID);
+      delete e.kneeFlag;
+    }
+  });
+  return s;
+}
+function normDay(d){
+  if(!d || typeof d!=="object") return d;
+  if(d.morningStiff!==undefined){
+    if(d.morningStiff){ d.morning=d.morning||{}; if(d.morning[POLVI_ID]==null) d.morning[POLVI_ID]=num(d.morningStiff); }
+    delete d.morningStiff;
+  }
+  return d;
 }
 async function put(store,val){
   const arr=mem[store], kp=kpOf(store), i=arr.findIndex(x=>x[kp]===val[kp]);
@@ -610,6 +682,29 @@ async function clearAll(){
 function metaGet(k,f){ const r=mem.meta.find(x=>x.key===k); return r ? r.value : f; }
 async function setMeta(k,v){ await put("meta",{key:k,value:v}); }
 function getCustom(){ return metaGet("customExercises",[]); }
+function getAils(){ return metaGet("ailments",[]); }
+async function saveAils(list){ await setMeta("ailments", list); }
+function ailOnLog(){ return metaGet("ailOnLog", true)!==false; }
+function activeAils(){ return ailOnLog() ? getAils().filter(a=>a.on) : []; }
+function dataUsesPolvi(){
+  return mem.sessions.some(s=>(s.ail&&s.ail[POLVI_ID]) || (s.exercises||[]).some(e=>(e.flags||[]).indexOf(POLVI_ID)>=0))
+      || mem.dayLogs.some(d=>d.morning && d.morning[POLVI_ID]!=null);
+}
+/* Ensimmäisellä käynnistyksellä uudella versiolla: jos dataa on polvesta,
+   luodaan Polvi-vaiva kaikilla lisäkentillä, jotta mikään vanha arvo ei jää
+   piiloon. Muuten lista alkaa tyhjänä. */
+async function ensureAilConfig(){
+  if(metaGet("ailments", null)===null){
+    await saveAils(dataUsesPolvi() ? [Object.assign({},POLVI_DEFAULT,{f:Object.assign({},POLVI_DEFAULT.f)})] : []);
+  }
+}
+function slugId(name){
+  let base=String(name).toLowerCase().replace(/ä/g,"a").replace(/ö/g,"o").replace(/å/g,"a").replace(/[^a-z0-9]+/g,"").slice(0,24)||"vaiva";
+  const taken=new Set(getAils().map(a=>a.id));
+  mem.sessions.forEach(s=>Object.keys(s.ail||{}).forEach(id=>taken.add(id)));
+  let id=base, i=2; while(taken.has(id)) id=base+(i++);
+  return id;
+}
 async function saveCustom(list){ await setMeta("customExercises", list); }
 function dget(date){ return mem.dayLogs.find(x=>x.date===date) || null; }
 async function dput(date, patch){
@@ -630,14 +725,17 @@ let editingId = null;
 let calMonth = new Date();
 let current = "log";
 let prevView = "log";
+let ailOpen = {};      /* kirjauskortin "Lisätiedot" auki vaivoittain */
+let flagPicker = null; /* liikkeen indeksi, jonka vaivavalitsin on auki */
+let ailSel = null;     /* Vaivat-välilehdellä valittu vaiva */
+let ailEditing = null; /* Asetuksissa muokattava vaiva */
 
 function blankDraft(){
   return {
-    date: todayStr(), type:"gym", dur:"",
+    date: todayStr(), type:"gym", dur:"", durMuu:false,
     exercises:[],
     climb:{ style:"", sends:{} },
-    knee:{ during:"", after:"", stiff:false, swell:false, note:"" },
-    kneeTouched:false,
+    ail:{},          /* id -> {pain, after, stiff, swell, note, n}; myös piilotettujen vaivojen arvot säilyvät */
     note:"", bw:"", sleep:"", rec:""
   };
 }
@@ -651,7 +749,29 @@ function volumeOf(s){
   return v;
 }
 function sendsOf(s){ let n=0; const sd=(s.climb&&s.climb.sends)||{}; Object.keys(sd).forEach(k=>n+=sd[k]); return n; }
-function hasKnee(s){ const k=s.knee; return !!(k && (k.during!=null || k.after!=null || k.stiff || k.swell || (k.note&&k.note.trim()))); }
+function entryHas(en){ return !!(en && (en.pain!=null || en.after!=null || en.stiff || en.swell || (en.note&&String(en.note).trim()))); }
+function ailIds(s){ return Object.keys(s.ail||{}).filter(id=>entryHas(s.ail[id])); }
+/* Nimi asetuksista; poistetulle vaivalle merkintään tallennettu nimi. */
+function ailName(id, en){
+  const a=getAils().find(x=>x.id===id); if(a) return a.name;
+  if(en && en.n) return en.n;
+  for(const s of mem.sessions){ const e=s.ail&&s.ail[id]; if(e&&e.n) return e.n; }
+  return id===POLVI_ID ? "Polvi" : id;
+}
+function ailShort(en){
+  const p=[];
+  if(en.pain!=null) p.push(en.pain+"/10");
+  if(en.after!=null) p.push(en.after+"/10 jälkeen");
+  if(en.stiff) p.push("jäykkyys");
+  if(en.swell) p.push("turvotus");
+  return p.join(", ")||"merkitty";
+}
+/* Kalenterin yhteinen "vaiva oireili" -piste. */
+function ailFlared(s){
+  if((s.exercises||[]).some(e=>(e.flags||[]).length)) return true;
+  return ailIds(s).some(id=>{ const en=s.ail[id]; return en.stiff || en.swell || (en.pain||0)>=4 || (en.after||0)>=4; });
+}
+function painTone(v){ return v==null?"":(v<=2?"v-ok":(v<=5?"v-mid":"v-bad")); }
 function allExerciseNames(){
   const set=new Set();
   Object.values(CATALOG).forEach(a=>a.forEach(n=>set.add(n)));
@@ -670,10 +790,10 @@ function lastPerformance(name, beforeId){
   }
   return null;
 }
-function kneeAggravators(sessions){
+function ailAggravators(sessions, id){
   const m={};
   sessions.forEach(s=>(s.exercises||[]).forEach(e=>{
-    if(e.kneeFlag){ const o=m[e.name]=m[e.name]||{n:0,last:""}; o.n++; if(s.date>o.last) o.last=s.date; }
+    if((e.flags||[]).indexOf(id)>=0){ const o=m[e.name]=m[e.name]||{n:0,last:""}; o.n++; if(s.date>o.last) o.last=s.date; }
   }));
   return Object.keys(m).map(k=>({name:k, n:m[k].n, last:m[k].last})).sort((a,b)=> b.n-a.n || b.last.localeCompare(a.last));
 }
@@ -694,24 +814,24 @@ function demo(){
         const sends={}; sends[BOULDER[idx]]=2+((w+off)%3); sends[BOULDER[Math.max(0,idx-1)]]=4;
         S.push({id:"demo"+w+"_"+off, date:ds, type:"climb", dur:80,
           climb:{style:"boulder-sisa", sends:sends},
-          knee:{during:2, after:3, stiff:(w%2===0), swell:false, note:""}, note:"", createdAt:ds});
+          ail:{polvi:{n:"Polvi", pain:2, after:3, stiff:(w%2===0), swell:false, note:""}}, note:"", createdAt:ds});
       } else {
         const exs=plan.filter((p,i)=>(i+off)%2===0).slice(0,4).map(p=>{
           const wgt = p[1] ? Math.round((p[1]+(11-w)*1.5)/2.5)*2.5 : 0;
-          return {name:p[0], kneeFlag:(p[0]==="Bulgarialainen askelkyykky" && w>7), sets:[1,2,3].map(()=>({reps:5, weight:wgt, rpe:8}))};
+          return {name:p[0], flags:(p[0]==="Bulgarialainen askelkyykky" && w>7)?["polvi"]:[], sets:[1,2,3].map(()=>({reps:5, weight:wgt, rpe:8}))};
         });
         S.push({id:"demo"+w+"_"+off, date:ds, type:"gym", dur:65, exercises:exs,
-          knee:{during:(w>8?3:1), after:(w>8?4:2), stiff:(w>8), swell:false, note:(w>8?"jäykkä alkuun, aukesi lämmittelyssä":"")}, note:"", createdAt:ds});
+          ail:{polvi:{n:"Polvi", pain:(w>8?3:1), after:(w>8?4:2), stiff:(w>8), swell:false, note:(w>8?"jäykkä alkuun, aukesi lämmittelyssä":"")}}, note:"", createdAt:ds});
       }
-      D.push({date:ds, bw: Math.round((78-(11-w)*0.05)*10)/10, sleep:7.5, rec:4, morningStiff:(w>8?3:2)});
+      D.push({date:ds, bw: Math.round((78-(11-w)*0.05)*10)/10, sleep:7.5, rec:4, morning:{polvi:(w>8?3:2)}});
     }
   }
   return { sessions:S.sort((a,b)=>b.date.localeCompare(a.date)), days:mapDays(D) };
 }
 function view(){
-  if(mem.sessions.length) return { sessions:mem.sessions, days:mapDays(mem.dayLogs), isDemo:false };
+  if(mem.sessions.length) return { sessions:mem.sessions, days:mapDays(mem.dayLogs), ails:getAils(), isDemo:false };
   if(!DEMO) DEMO=demo();
-  return { sessions:DEMO.sessions, days:DEMO.days, isDemo:true };
+  return { sessions:DEMO.sessions, days:DEMO.days, ails:[POLVI_DEFAULT], isDemo:true };
 }
 function demoBanner(){
   return '<div class="banner"><span>Esimerkkidata</span><span style="color:var(--ink-2)">Näet miltä näkymä näyttää. Ensimmäinen oma treeni korvaa tämän.</span></div>';
@@ -827,8 +947,26 @@ function renderExos(){
     '</div>';
     return;
   }
+  const act=activeAils();
   host.innerHTML = draft.exercises.map((e,ei)=>{
     const last=lastPerformance(e.name, editingId);
+    const fl=e.flags||(e.flags=[]);
+    /* Yhdellä seurattavalla vaivalla nappi toimii kuten ennen ("Polvi oireili", yksi
+       napautus). Useammalla se avaa valitsimen. Piilotettujen vaivojen merkinnät
+       säilyvät liikkeellä, vaikka niitä ei näytetä. */
+    let chip="", pick="";
+    if(act.length){
+      const named=fl.filter(id=>act.some(a=>a.id===id)).map(id=>ailName(id));
+      const one=act.length===1;
+      const label = one ? act[0].name+" oireili" : (named.length ? named.join(", ")+" oireili" : "Oireili");
+      const pressed = one ? fl.indexOf(act[0].id)>=0 : named.length>0;
+      chip='<button class="chip warn sm" data-flag-ex="'+ei+'" aria-pressed="'+(pressed?"true":"false")+'"'+(one?'':' aria-expanded="'+(flagPicker===ei?"true":"false")+'"')+'>'+esc(label)+'</button>';
+      if(!one && flagPicker===ei){
+        pick='<div class="flagpick"><div class="xs muted" style="margin-bottom:6px">Mikä vaiva oireili tässä liikkeessä?</div><div class="chips">'+
+          act.map(a=>'<button class="chip warn sm" data-flag-pick="'+ei+':'+esc(a.id)+'" aria-pressed="'+(fl.indexOf(a.id)>=0?"true":"false")+'">'+esc(a.name)+'</button>').join("")+
+          '</div></div>';
+      }
+    }
     const rows=e.sets.map((st,si)=>
       '<div class="set-row">'+
         '<span class="idx">'+(si+1)+'</span>'+
@@ -840,16 +978,61 @@ function renderExos(){
     return '<div class="exo">'+
       '<div class="exo-head">'+
         '<h3>'+esc(e.name)+'</h3>'+
-        '<button class="chip warn sm" data-knee-ex="'+ei+'" aria-pressed="'+(e.kneeFlag?"true":"false")+'">Polvi oireili</button>'+
+        chip+
         '<button class="btn ghost" data-del-ex="'+ei+'" aria-label="Poista liike">Poista</button>'+
       '</div>'+
       (last ? '<div class="exo-last">Viimeksi: '+esc(last)+'</div>' : '<div class="exo-last">Ensimmäinen kerta kirjattuna</div>')+
+      pick+
       '<div class="sets">'+
         '<div class="set-head"><span>#</span><span>Toistot</span><span>Paino kg</span><span>RPE</span><span></span></div>'+
         rows+
         '<button class="btn" data-add-set="'+ei+'" style="margin-top:9px; width:100%">+ Sarja</button>'+
       '</div></div>';
   }).join("");
+}
+function scaleBtns(val, kind, id){
+  let h="";
+  for(let i=0;i<=10;i++){
+    const tone=i<=2?"":(i<=5?"mid":"bad");
+    h+='<button type="button" class="'+tone+'" data-ail-set="'+kind+':'+id+':'+i+'" aria-pressed="'+(val===i?"true":"false")+'" aria-label="'+i+'">'+((i===0||i===5||i===10||val===i)?i:"")+'</button>';
+  }
+  return h;
+}
+function renderAilCard(){
+  const host=$("#ailCard"); if(!host) return;
+  const act=activeAils();
+  if(!act.length){ host.innerHTML=""; return; }
+  host.innerHTML='<div class="card">'+
+    '<div class="row" style="margin-bottom:2px"><div class="eyebrow grow">Vaivat</div><span class="xs muted">Kipu treenin aikana 0–10</span></div>'+
+    act.map(a=>{
+      const en=draft.ail[a.id]||{}, f=a.f||{}, open=!!ailOpen[a.id];
+      const filled=[en.after!=null?"jälkeen "+en.after:"", en.stiff?"jäykkyys":"", en.swell?"turvotus":"", String(en.note||"").trim()?"muistiinpano":""].filter(Boolean);
+      let more="";
+      if(open){
+        more='<div class="ail-more">'+
+          (f.after?'<div class="xs muted">Kipu treenin jälkeen</div><div class="scale">'+scaleBtns(en.after,"after",a.id)+'</div>':'')+
+          ((f.stiff||f.swell)?'<div class="chips" style="margin-top:12px">'+
+            (f.stiff?'<button type="button" class="chip warn" data-ail-x="stiff:'+a.id+'" aria-pressed="'+(en.stiff?"true":"false")+'">Jäykkyyttä</button>':'')+
+            (f.swell?'<button type="button" class="chip warn" data-ail-x="swell:'+a.id+'" aria-pressed="'+(en.swell?"true":"false")+'">Turvotusta</button>':'')+
+          '</div>':'')+
+          '<label class="field" style="margin-top:12px">Muistiinpano'+
+            '<input type="text" data-ail-note="'+a.id+'" value="'+esc(en.note||"")+'" placeholder="esim. jäykkä alussa, aukesi lämmittelyssä"></label>'+
+        '</div>';
+      }
+      return '<div class="ail">'+
+        '<div class="ail-head"><span class="ail-name">'+esc(a.name)+'</span>'+
+          '<span class="ail-val '+painTone(en.pain)+'">'+(en.pain==null?"–":en.pain)+'</span></div>'+
+        '<div class="scale" role="group" aria-label="'+esc(a.name)+': kipu treenin aikana">'+scaleBtns(en.pain,"pain",a.id)+'</div>'+
+        '<div class="scale-legend"><span>ei kipua</span><span>pahin mahdollinen</span></div>'+
+        '<button type="button" class="disclose" data-ail-open="'+a.id+'" aria-expanded="'+(open?"true":"false")+'">'+
+          (open?"− Vähemmän":"+ Lisätiedot"+(filled.length?" · "+esc(filled.join(", ")):""))+'</button>'+
+        more+
+      '</div>';
+    }).join("")+
+    (draft.type==="gym"
+      ? '<div class="xs muted" style="margin-top:8px">Jos yksittäinen liike ärsytti, merkitse se liikkeen '+(act.length===1?'"'+esc(act[0].name)+' oireili"':'"Oireili"')+' -napista.</div>'
+      : '')+
+  '</div>';
 }
 function renderGrades(){
   const isRoute=draft.climb.style.indexOf("koysi")===0;
@@ -862,18 +1045,16 @@ function renderGrades(){
 }
 function syncForm(){
   $("#fDate").value = draft.date;
-  $("#fDur").value = draft.dur;
+  const dur=String(draft.dur==null?"":draft.dur);
+  const muu = draft.durMuu || (dur!=="" && DUR_OPTS.indexOf(dur)<0);
+  $("#fDur").value = muu ? "muu" : dur;
+  $("#durOtherWrap").hidden = !muu;
+  $("#fDurOther").value = muu ? dur : "";
   $$("#fType button").forEach(b=>b.setAttribute("aria-pressed", String(b.dataset.t===draft.type)));
   $("#gymPane").hidden = draft.type!=="gym";
   $("#climbPane").hidden = draft.type!=="climb";
   $$("#cStyle button").forEach(b=>b.setAttribute("aria-pressed", String(b.dataset.v===draft.climb.style)));
 
-  $("#fKDuring").value = draft.knee.during===""?0:draft.knee.during;
-  $("#fKAfter").value  = draft.knee.after===""?0:draft.knee.after;
-  $("#kDuringOut").textContent = draft.kneeTouched||draft.knee.during!=="" ? String(draft.knee.during===""?0:draft.knee.during) : "–";
-  $("#kAfterOut").textContent  = draft.kneeTouched||draft.knee.after!==""  ? String(draft.knee.after===""?0:draft.knee.after)  : "–";
-  $$("#fKneeFlags button").forEach(b=>b.setAttribute("aria-pressed", String(!!draft.knee[b.dataset.v])));
-  $("#fKneeNote").value = draft.knee.note;
 
   $("#fNote").value = draft.note;
   $("#fBw").value = draft.bw; $("#fSleep").value = draft.sleep; $("#fRec").value = draft.rec;
@@ -881,7 +1062,7 @@ function syncForm(){
   const hint=$("#editHint");
   hint.hidden = !editingId;
   if(editingId) hint.textContent = "Muokkaat "+fiDate(draft.date)+" tallennettua treeniä.";
-  renderExos(); renderGrades();
+  renderExos(); renderGrades(); renderAilCard();
 }
 function renderRecent(){
   const host=$("#recent");
@@ -890,21 +1071,15 @@ function renderRecent(){
     const meta = s.type==="gym"
       ? nkpl((s.exercises||[]).length,"liike","liikettä")+" · "+fmt(volumeOf(s))+" kg volyymia"
       : (STYLE_LABEL[s.climb&&s.climb.style]||"Kiipeily")+" · "+nkpl(sendsOf(s),"läpimeno","läpimenoa");
-    const k = hasKnee(s) ? ' · polvi '+kneeShort(s.knee) : "";
+    const ids=ailIds(s);
+    const k = ids.length ? ' · '+ids.map(id=>{ const en=s.ail[id];
+      return ailName(id,en)+(en.pain!=null ? " "+en.pain+"/10" : (en.after!=null ? " "+en.after+"/10 jälkeen" : "")); }).join(", ") : "";
     return '<div class="item"><i class="tagdot '+(s.type==="gym"?"gym":"climb")+'"></i>'+
       '<div class="grow"><b>'+esc(fiDate(s.date))+" "+esc(s.type==="gym"?"Sali":"Kiipeily")+'</b>'+
       '<div class="meta">'+esc(meta+k)+'</div>'+
       (s.note?'<div class="meta" style="color:var(--ink-3)">'+esc(s.note)+'</div>':"")+'</div>'+
       '<button class="btn ghost" data-edit="'+s.id+'">Muokkaa</button></div>';
   }).join("");
-}
-function kneeShort(k){
-  const p=[];
-  if(k.during!=null) p.push(k.during+"/10 aikana");
-  if(k.after!=null) p.push(k.after+"/10 jälkeen");
-  if(k.stiff) p.push("jäykkyys");
-  if(k.swell) p.push("turvotus");
-  return p.join(", ")||"merkitty";
 }
 
 /* --- liikevalitsin --- */
@@ -963,7 +1138,7 @@ function addExercise(name){
     const e=(s.exercises||[]).find(x=>x.name===name);
     if(e && e.sets && e.sets.length){ seed=e.sets.map(st=>({reps:st.reps, weight:st.weight, rpe:""})); break; }
   }
-  draft.exercises.push({ name:name, kneeFlag:false, sets:seed });
+  draft.exercises.push({ name:name, flags:[], sets:seed });
   if(!allExerciseNames().includes(name)) saveCustom(getCustom().concat([name]));
   renderExos();
 }
@@ -971,8 +1146,8 @@ function addExercise(name){
 /* --- tallennus --- */
 function collect(){
   draft.date = $("#fDate").value || todayStr();
-  draft.dur = $("#fDur").value;
-  draft.knee.note = $("#fKneeNote").value;
+  const dsel=$("#fDur").value;
+  draft.dur = dsel==="muu" ? $("#fDurOther").value : dsel;
   draft.note = $("#fNote").value;
   draft.bw = $("#fBw").value; draft.sleep = $("#fSleep").value; draft.rec = $("#fRec").value;
 }
@@ -991,17 +1166,23 @@ async function save(){
     updatedAt: now
   };
 
-  const kt = draft.kneeTouched || draft.knee.stiff || draft.knee.swell || (draft.knee.note||"").trim();
-  s.knee = kt ? {
-    during: draft.knee.during==="" ? null : num(draft.knee.during),
-    after:  draft.knee.after===""  ? null : num(draft.knee.after),
-    stiff: !!draft.knee.stiff, swell: !!draft.knee.swell,
-    note: (draft.knee.note||"").trim()
-  } : null;
+  /* Kaikki draftin vaivamerkinnät tallennetaan, myös sellaisten vaivojen jotka
+     on piilotettu kirjauksesta: muokkaus ei saa pudottaa vanhaa dataa. Nimi
+     tallennetaan merkintään, jotta historia pysyy luettavana vaikka vaiva
+     poistettaisiin asetuksista. */
+  s.ail={};
+  Object.keys(draft.ail).forEach(id=>{
+    const en=draft.ail[id];
+    if(!entryHas(en)) return;
+    s.ail[id]={ n:ailName(id,en),
+      pain:  en.pain==null?null:num(en.pain),
+      after: en.after==null?null:num(en.after),
+      stiff: !!en.stiff, swell: !!en.swell, note: String(en.note||"").trim() };
+  });
 
   if(draft.type==="gym"){
     s.exercises = draft.exercises.map(e=>({
-      name:e.name, kneeFlag:!!e.kneeFlag,
+      name:e.name, flags:(e.flags||[]).slice(),
       sets:e.sets.filter(st=>num(st.reps)>0).map(st=>({reps:num(st.reps), weight:num(st.weight), rpe:st.rpe===""?0:num(st.rpe)}))
     })).filter(e=>e.sets.length);
     if(!s.exercises.length){ toast("Kirjaa vähintään yksi sarja"); return; }
@@ -1020,7 +1201,7 @@ async function save(){
       });
     }
     toast(editingId ? "Päivitetty" : "Tallennettu");
-    editingId=null; draft=blankDraft(); syncForm(); renderAll();
+    editingId=null; draft=blankDraft(); ailOpen={}; flagPicker=null; syncForm(); renderAll();
     window.scrollTo({top:0, behavior:"smooth"});
   }catch(e){ toast("Tallennus ei onnistunut"); }
 }
@@ -1028,15 +1209,15 @@ function loadForEdit(id){
   const s=mem.sessions.find(x=>x.id===id); if(!s) return;
   editingId=id;
   const d=dget(s.date)||{};
-  const k=s.knee||{};
+  const dur=s.dur?String(s.dur):"";
   draft={
-    date:s.date, type:s.type, dur:s.dur||"",
-    exercises:(s.exercises||[]).map(e=>({name:e.name, kneeFlag:!!e.kneeFlag, sets:e.sets.map(st=>({reps:st.reps, weight:st.weight, rpe:st.rpe||""}))})),
+    date:s.date, type:s.type, dur:dur, durMuu: dur!=="" && DUR_OPTS.indexOf(dur)<0,
+    exercises:(s.exercises||[]).map(e=>({name:e.name, flags:(e.flags||[]).slice(), sets:e.sets.map(st=>({reps:st.reps, weight:st.weight, rpe:st.rpe||""}))})),
     climb:{ style:(s.climb&&s.climb.style)||"", sends:Object.assign({},(s.climb&&s.climb.sends)||{}) },
-    knee:{ during:k.during==null?"":k.during, after:k.after==null?"":k.after, stiff:!!k.stiff, swell:!!k.swell, note:k.note||"" },
-    kneeTouched: hasKnee(s),
+    ail: JSON.parse(JSON.stringify(s.ail||{})),
     note:s.note||"", bw:d.bw==null?"":d.bw, sleep:d.sleep==null?"":d.sleep, rec:d.rec==null?"":d.rec
   };
+  ailOpen={}; flagPicker=null;
   go("log"); syncForm(); window.scrollTo({top:0, behavior:"smooth"});
 }
 
@@ -1058,7 +1239,7 @@ function renderCal(){
     const key=iso(new Date(y,m,d)), list=byDate[key]||[];
     const types=new Set(list.map(s=>s.type));
     let dots=[...types].map(t=>'<i class="'+(t==="gym"?"gym":"climb")+'"></i>').join("");
-    if(list.some(s=>s.knee && (s.knee.stiff || s.knee.swell || (s.knee.during||0)>=4 || (s.knee.after||0)>=4))) dots+='<i class="knee"></i>';
+    if(list.some(ailFlared)) dots+='<i class="ail"></i>';
     html+='<button class="day'+(list.length?" has":"")+(key===todayStr()?" today":"")+'" data-day="'+key+'">'+d+'<span class="dots">'+dots+'</span></button>';
   }
   $("#calGrid").innerHTML=html;
@@ -1078,7 +1259,8 @@ function renderDay(key){
   const V=view();
   const list=V.sessions.filter(s=>s.date===key);
   const d=V.days[key]||{};
-  if(!list.length && !d.bw && !d.morningStiff){ $("#calDay").innerHTML=""; return; }
+  const morning=d.morning||{}, mIds=Object.keys(morning).filter(id=>morning[id]!=null);
+  if(!list.length && !d.bw && !d.sleep && !d.rec && !mIds.length){ $("#calDay").innerHTML=""; return; }
   const dd=parseISO(key);
   let html='<div class="card" style="margin-top:12px"><div class="eyebrow">'+esc(dd.getDate()+". "+MONTHS[dd.getMonth()]+" "+dd.getFullYear())+'</div>';
   list.forEach(s=>{
@@ -1086,20 +1268,23 @@ function renderDay(key){
     if(s.type==="gym"){
       html+='<b>Salitreeni</b><div class="meta num">'+fmt(volumeOf(s))+' kg · '+(s.dur||"–")+' min</div>';
       html+='<div class="small" style="margin-top:6px">'+(s.exercises||[]).map(e=>
-        '<div class="row" style="justify-content:space-between; gap:10px; padding:2px 0"><span>'+esc(e.name)+(e.kneeFlag?' <span class="chip warn sm" aria-pressed="true">polvi</span>':'')+'</span><span class="num muted">'+
+        '<div class="row" style="justify-content:space-between; gap:10px; padding:2px 0"><span>'+esc(e.name)+(e.flags||[]).map(id=>' <span class="chip warn sm" aria-pressed="true">'+esc(ailName(id).toLowerCase())+'</span>').join("")+'</span><span class="num muted">'+
         e.sets.map(st=>num(st.reps)+"×"+fmt(num(st.weight),num(st.weight)%1?1:0)).join(", ")+'</span></div>').join("")+'</div>';
     } else {
       const sd=(s.climb&&s.climb.sends)||{};
       html+='<b>'+esc(STYLE_LABEL[s.climb&&s.climb.style]||"Kiipeily")+'</b><div class="meta num">'+nkpl(sendsOf(s),"läpimeno","läpimenoa")+' · '+(s.dur||"–")+' min</div>';
       html+='<div class="small num" style="margin-top:4px">'+Object.keys(sd).map(g=>esc(g)+"×"+sd[g]).join("  ")+'</div>';
     }
-    if(hasKnee(s)) html+='<div class="meta" style="margin-top:5px">Polvi: '+esc(kneeShort(s.knee))+(s.knee.note?' · '+esc(s.knee.note):"")+'</div>';
+    ailIds(s).forEach(id=>{ const en=s.ail[id];
+      html+='<div class="meta" style="margin-top:5px">'+esc(ailName(id,en))+': '+esc(ailShort(en))+(en.note?' · '+esc(en.note):"")+'</div>'; });
     if(s.note) html+='<div class="meta" style="color:var(--ink-3)">'+esc(s.note)+'</div>';
     html+='</div>'+(V.isDemo?"":'<div style="display:flex; flex-direction:column; gap:2px"><button class="btn ghost" data-edit="'+s.id+'">Muokkaa</button><button class="btn danger" data-rm="'+s.id+'">Poista</button></div>')+'</div>';
   });
-  if(d.bw||d.sleep||d.rec||d.morningStiff){
+  if(d.bw||d.sleep||d.rec||mIds.length){
     html+='<div class="item"><div class="grow"><b>Päivän mittarit</b><div class="meta num">'+
-      [d.bw?fmt(d.bw,1)+" kg":"", d.sleep?fmt(d.sleep,1)+" h unta":"", d.rec?"palautuminen "+d.rec+"/5":"", d.morningStiff?"aamujäykkyys "+d.morningStiff+"/5":""].filter(Boolean).join(" · ")+'</div></div></div>';
+      [d.bw?fmt(d.bw,1)+" kg":"", d.sleep?fmt(d.sleep,1)+" h unta":"", d.rec?"palautuminen "+d.rec+"/5":""]
+        .concat(mIds.map(id=>"aamujäykkyys ("+esc(ailName(id).toLowerCase())+") "+morning[id]+"/5"))
+        .filter(Boolean).join(" · ")+'</div></div></div>';
   }
   $("#calDay").innerHTML = html+'</div>';
 }
@@ -1200,78 +1385,202 @@ function renderPR(V){
 }
 
 /* ============================================================
-   11. Polvi
+   11. Vaivat
    ============================================================ */
-function renderKnee(){
+/* Välilehdellä näkyvät vaivat: asetusten vaivat jotka ovat seurannassa tai
+   joilla on dataa, sekä asetuksista poistetut vaivat joilla on historiaa. */
+function ailList(V){
+  const used={};
+  V.sessions.forEach(s=>{
+    ailIds(s).forEach(id=>{ if(!used[id]) used[id]=s.ail[id].n||""; });
+    (s.exercises||[]).forEach(e=>(e.flags||[]).forEach(id=>{ if(used[id]==null) used[id]=""; }));
+  });
+  Object.keys(V.days).forEach(k=>{ const m=V.days[k].morning||{}; Object.keys(m).forEach(id=>{ if(m[id]!=null && used[id]==null) used[id]=""; }); });
+  const out=V.ails.filter(a=>a.on || used[a.id]!=null).map(a=>({id:a.id, name:a.name, f:a.f||{}, on:a.on, cfg:true}));
+  Object.keys(used).forEach(id=>{ if(!V.ails.some(a=>a.id===id)) out.push({id:id, name:used[id]||ailName(id), f:{}, on:false, cfg:false}); });
+  return out;
+}
+function renderAil(){
   const V=view();
-  $("#kneeBanner").innerHTML = V.isDemo ? demoBanner() : "";
+  $("#ailBanner").innerHTML = V.isDemo ? demoBanner() : "";
+  const list=ailList(V);
+  if(!list.length){
+    $("#ailPicker").innerHTML="";
+    $("#ailBody").innerHTML='<div class="card"><div class="empty">Et seuraa vielä yhtään vaivaa.<br>Lisää esimerkiksi polvi tai selkä asetuksista.</div>'+
+      '<button class="btn block" data-goto="data">Avaa asetukset</button></div>';
+    return;
+  }
+  if(!ailSel || !list.some(a=>a.id===ailSel)) ailSel=list[0].id;
+  const A=list.find(a=>a.id===ailSel), id=A.id, nm=A.name;
+  $("#ailPicker").innerHTML = list.length>1
+    ? '<div class="card" style="margin-bottom:12px"><div class="chips">'+list.map(a=>
+        '<button class="chip" data-ail-tab="'+esc(a.id)+'" aria-pressed="'+(a.id===ailSel?"true":"false")+'">'+esc(a.name)+
+        (a.cfg ? (a.on?'':' · ei seurannassa') : ' · poistettu')+'</button>').join("")+'</div></div>'
+    : '';
 
-  const kneeSessions = V.sessions.filter(hasKnee).sort((a,b)=>a.date.localeCompare(b.date));
+  const ent=V.sessions.filter(s=>s.ail && entryHas(s.ail[id])).sort((a,b)=>a.date.localeCompare(b.date));
+  let html="";
 
-  if(!kneeSessions.length){
-    $("#kneeStatus").innerHTML = '<div class="empty">Kirjaa polven tuntumaa treenin yhteydessä, niin näet kehityksen tässä.</div>';
+  /* nykytila */
+  if(!ent.length){
+    html+='<div class="card"><div class="eyebrow">'+esc(nm)+'</div><div class="empty">Kirjaa '+esc(nm.toLowerCase())+' treenin yhteydessä, niin näet kehityksen tässä.</div></div>';
   } else {
-    const lastK=kneeSessions[kneeSessions.length-1];
-    const prevK=kneeSessions[kneeSessions.length-2];
-    const dv = (prevK && lastK.knee.during!=null && prevK.knee.during!=null) ? lastK.knee.during-prevK.knee.during : null;
-    const trend = dv==null ? '' :
-      '<span class="delta'+(dv<-0.5?"":(dv>0.5?" down":" flat"))+'">'+(dv>0?"+":"")+fmt(dv,0)+' vs. edellinen</span>';
-    $("#kneeStatus").innerHTML =
-      '<div class="eyebrow">Nykytila</div>'+
+    const L=ent[ent.length-1].ail[id], P=ent.length>1 ? ent[ent.length-2].ail[id] : null;
+    const dv=(P && L.pain!=null && P.pain!=null) ? L.pain-P.pain : null;
+    const trend = dv==null ? '' : '<span class="delta'+(dv<-0.5?"":(dv>0.5?" down":" flat"))+'">'+(dv>0?"+":"")+fmt(dv,0)+' vs. edellinen</span>';
+    const hasAfter=ent.some(s=>s.ail[id].after!=null);
+    html+='<div class="card"><div class="eyebrow">'+esc(nm)+' · nykytila</div>'+
       '<div class="row wrap" style="gap:18px; margin-top:10px; align-items:baseline">'+
-        '<div class="stat"><div class="bignum num">'+(lastK.knee.during==null?"–":lastK.knee.during)+'</div><div class="xs muted">kipu aikana</div></div>'+
-        '<div class="stat"><div class="bignum num">'+(lastK.knee.after==null?"–":lastK.knee.after)+'</div><div class="xs muted">kipu jälkeen</div></div>'+
+        '<div class="stat"><div class="bignum num">'+(L.pain==null?"–":L.pain)+'</div><div class="xs muted">kipu aikana</div></div>'+
+        (hasAfter?'<div class="stat"><div class="bignum num">'+(L.after==null?"–":L.after)+'</div><div class="xs muted">kipu jälkeen</div></div>':'')+
         '<div class="grow"></div>'+trend+
       '</div>'+
-      '<div class="small muted" style="margin-top:10px">Viimeksi '+esc(fiDate(lastK.date))+
-        (lastK.knee.stiff?' · jäykkyyttä':'')+(lastK.knee.swell?' · turvotusta':'')+
-        (lastK.knee.note?' · '+esc(lastK.knee.note):'')+'</div>';
+      '<div class="small muted" style="margin-top:10px">Viimeksi '+esc(fiDate(ent[ent.length-1].date))+
+        (L.stiff?' · jäykkyyttä':'')+(L.swell?' · turvotusta':'')+(L.note?' · '+esc(L.note):'')+'</div></div>';
   }
 
-  if(kneeSessions.length<2){
-    $("#kneePainChart").innerHTML = '<div class="empty">Vähintään kaksi kirjausta tarvitaan käyrään.</div>';
-    $("#kneeLoadChart").innerHTML = '<div class="empty">—</div>';
-  } else {
-    const labels = kneeSessions.map(s=>fiDate(s.date));
-    $("#kneePainChart").innerHTML = svgLines(labels, [
-      {name:"aikana", color:"var(--red)", ys:kneeSessions.map(s=>s.knee.during)},
-      {name:"jälkeen", color:"var(--amber)", ys:kneeSessions.map(s=>s.knee.after)}
-    ], {min:0, max:10});
+  /* kipukäyrä */
+  const pe=ent.filter(s=>s.ail[id].pain!=null || s.ail[id].after!=null);
+  html+='<div class="card"><div class="eyebrow">Kipukäyrä</div><div class="xs muted" style="margin:3px 0 6px">Treeneittäin, 0 = ei kipua</div>';
+  if(pe.length<2) html+='<div class="empty">Vähintään kaksi kirjausta tarvitaan käyrään.</div>';
+  else {
+    const series=[{name:"aikana", color:"var(--red)", ys:pe.map(s=>s.ail[id].pain)}];
+    if(pe.some(s=>s.ail[id].after!=null)) series.push({name:"jälkeen", color:"var(--amber)", ys:pe.map(s=>s.ail[id].after)});
+    html+=svgLines(pe.map(s=>fiDate(s.date)), series, {min:0, max:10});
+  }
+  html+='</div>';
 
-    const firstW=weekKey(parseISO(kneeSessions[0].date));
-    const lastW=weekKey(new Date());
+  /* kuorma vs. oireet */
+  html+='<div class="card"><div class="eyebrow">Kuorma vs. oireet</div><div class="xs muted" style="margin:3px 0 6px">Salin viikkovolyymi samalta ajalta — vertaa kipukäyrään</div>';
+  if(pe.length<2) html+='<div class="empty">—</div>';
+  else {
+    const firstW=weekKey(parseISO(pe[0].date)), lastW=weekKey(new Date());
     const weeks=[]; let cur=parseISO(firstW), guard=0;
     while(iso(cur)<=lastW && guard++<80){ weeks.push(iso(cur)); cur=new Date(cur.getFullYear(),cur.getMonth(),cur.getDate()+7); }
-    const volByWeek={}; weeks.forEach(w=>volByWeek[w]=0);
-    V.sessions.forEach(s=>{ const w=weekKey(parseISO(s.date)); if(w in volByWeek) volByWeek[w]+=volumeOf(s); });
-    $("#kneeLoadChart").innerHTML = svgBars(weeks.map(w=>({label:"vko "+fiDate(w), short:fiDate(w).slice(0,-1), value:Math.round(volByWeek[w])})), "var(--accent)", "kg");
+    const vol={}; weeks.forEach(w=>vol[w]=0);
+    V.sessions.forEach(s=>{ const w=weekKey(parseISO(s.date)); if(w in vol) vol[w]+=volumeOf(s); });
+    html+=svgBars(weeks.map(w=>({label:"vko "+fiDate(w), short:fiDate(w).slice(0,-1), value:Math.round(vol[w])})), "var(--accent)", "kg");
+  }
+  html+='</div>';
+
+  /* aamujäykkyys: kirjaus vain kun kenttä on päällä tälle vaivalle */
+  const mPts=Object.keys(V.days).filter(k=>V.days[k].morning && V.days[k].morning[id]>0).sort().slice(-40)
+    .map(k=>({y:V.days[k].morning[id], label:fiDate(k), short:fiDate(k)}));
+  const canLog = !V.isDemo && A.cfg && A.on && A.f.morning;
+  if(canLog || mPts.length){
+    const tv=((dget(todayStr())||{}).morning||{})[id];
+    html+='<div class="card"><div class="eyebrow">Aamujäykkyys</div>';
+    if(canLog){
+      html+='<div class="xs muted" style="margin:3px 0 8px">Kirjaa herätessä, ei tarvitse kirjata treeniä</div><div class="row wrap" style="gap:6px">'+
+        [1,2,3,4,5].map(v=>'<button class="chip warn" data-morning="'+esc(id)+':'+v+'" aria-pressed="'+(tv===v?"true":"false")+'">'+v+(v===1?" · notkea":v===5?" · jäykkä":"")+'</button>').join("")+'</div>';
+    }
+    html+='<div style="margin-top:12px">'+(mPts.length>1 ? svgLine(mPts, "var(--amber)", "/5", 0, [1,5]) : '<div class="empty">Kirjaa aamujäykkyys muutamana päivänä.</div>')+'</div></div>';
   }
 
-  const todayLog = dget(todayStr()) || {};
-  $$("#mStiffChips button").forEach(b=>b.setAttribute("aria-pressed", String(String(todayLog.morningStiff||"")===b.dataset.v)));
-  const stiffPts = Object.keys(V.days).filter(k=>V.days[k].morningStiff>0).sort().slice(-40)
-    .map(k=>({y:V.days[k].morningStiff, label:fiDate(k), short:fiDate(k)}));
-  $("#mStiffChart").innerHTML = stiffPts.length>1
-    ? svgLine(stiffPts, "var(--amber)", "/5", 0, [1,5])
-    : '<div class="empty">Kirjaa aamujäykkyys muutamana päivänä.</div>';
+  /* liikkeet jotka ovat oireilleet */
+  const aggr=ailAggravators(V.sessions, id);
+  html+='<div class="card"><div class="eyebrow">Liikkeet jotka ovat oireilleet</div><div style="margin-top:8px">'+
+    (aggr.length
+      ? aggr.map(a=>'<div class="item"><div class="grow"><b>'+esc(a.name)+'</b><div class="meta">'+nkpl(a.n,"kerta","kertaa")+' · viimeksi '+esc(fiDate(a.last))+'</div></div></div>').join("")
+      : '<div class="empty">Ei merkintöjä. Kirjatessa paina liikkeen oireilunappia, jos jokin liike ärsytti.</div>')+
+    '</div></div>';
 
-  const aggr=kneeAggravators(V.sessions);
-  $("#kneeAggr").innerHTML = aggr.length
-    ? aggr.map(a=>'<div class="item"><div class="grow"><b>'+esc(a.name)+'</b><div class="meta">'+nkpl(a.n,"kerta","kertaa")+' · viimeksi '+esc(fiDate(a.last))+'</div></div></div>').join("")
-    : '<div class="empty">Ei merkintöjä. Kirjatessa paina liikkeen "Polvi oireili" jos jokin liike ärsytti polvea.</div>';
+  /* muistiinpanot */
+  const notes=ent.filter(s=>String(s.ail[id].note||"").trim()).sort((a,b)=>b.date.localeCompare(a.date)).slice(0,12);
+  html+='<div class="card"><div class="eyebrow">Muistiinpanot</div><div style="margin-top:4px">'+
+    (notes.length
+      ? notes.map(s=>'<div class="item"><div class="grow"><b class="xs num">'+esc(fiDate(s.date))+'</b> <span class="small">'+esc(s.ail[id].note)+'</span></div></div>').join("")
+      : '<div class="empty">Ei muistiinpanoja vielä.</div>')+
+    '</div></div>';
 
-  const notes = V.sessions.filter(s=>s.knee && (s.knee.note||"").trim())
-    .sort((a,b)=>b.date.localeCompare(a.date)).slice(0,12);
-  $("#kneeNotesList").innerHTML = notes.length
-    ? notes.map(s=>'<div class="item"><div class="grow"><b class="xs num">'+esc(fiDate(s.date))+'</b> <span class="small">'+esc(s.knee.note)+'</span></div></div>').join("")
-    : '<div class="empty">Ei polvimuistiinpanoja vielä.</div>';
+  $("#ailBody").innerHTML=html;
 }
-async function setMorningStiff(v){
+async function setMorning(id, v){
   const cur=dget(todayStr())||{};
-  const nv = String(cur.morningStiff||"")===String(v) ? "" : num(v);
-  await dput(todayStr(), {morningStiff: nv});
-  renderKnee();
-  toast(nv? "Aamujäykkyys "+nv+"/5" : "Aamujäykkyys poistettu");
+  const m=Object.assign({}, cur.morning||{});
+  const nv = String(m[id]==null?"":m[id])===String(v) ? null : num(v);
+  if(nv==null) delete m[id]; else m[id]=nv;
+  await dput(todayStr(), {morning: Object.keys(m).length ? m : ""});
+  renderAil();
+  toast(nv ? "Aamujäykkyys "+nv+"/5" : "Aamujäykkyys poistettu");
+}
+
+/* --- asetukset: vaivaseuranta --- */
+async function updAil(id, fn){
+  await saveAils(getAils().map(a=>{
+    if(a.id!==id) return a;
+    const c=Object.assign({}, a, {f:Object.assign({}, a.f||{})});
+    fn(c); return c;
+  }));
+}
+function renderAilSettings(){
+  const on=ailOnLog();
+  $("#ailMaster").setAttribute("aria-checked", on?"true":"false");
+  $("#ailMasterSub").textContent = on ? "Näkyy treenin kirjaussivulla" : "Piilotettu kirjaussivulta";
+  const list=getAils();
+  $("#ailCount").textContent = list.length ? list.filter(a=>a.on).length+" / "+list.length+" seurannassa" : "";
+  $("#ailCfgList").innerHTML = list.length ? list.map(a=>{
+    const f=a.f||{};
+    const sub=AIL_FIELDS.filter(x=>f[x[0]]).map(x=>x[1].split(" (")[0].toLowerCase());
+    let panel="";
+    if(ailEditing===a.id){
+      panel='<div class="editpanel">'+
+        '<label class="field">Nimi<input type="text" data-ail-rename="'+esc(a.id)+'" value="'+esc(a.name)+'" maxlength="40"></label>'+
+        '<div class="xs muted" style="margin:12px 0 2px">Lisäkentät — kipu 0–10 ja muistiinpano ovat aina mukana</div>'+
+        AIL_FIELDS.map(x=>'<label class="checkrow"><input type="checkbox" data-ail-field="'+x[0]+':'+esc(a.id)+'"'+(f[x[0]]?" checked":"")+'> '+esc(x[1])+'</label>').join("")+
+        '<div class="row" style="margin-top:10px"><button class="btn" data-ail-done="1">Valmis</button><span class="grow"></span>'+
+        '<button class="btn danger" data-ail-del="'+esc(a.id)+'">Poista vaiva</button></div>'+
+      '</div>';
+    }
+    return '<div class="cfg-row"><div class="grow"><div class="cfg-name">'+esc(a.name)+'</div>'+
+        '<div class="cfg-sub">Kipu 0–10'+(sub.length?" + "+esc(sub.join(", ")):"")+'</div></div>'+
+        '<button class="btn ghost" data-ail-edit="'+esc(a.id)+'">'+(ailEditing===a.id?"Sulje":"Muokkaa")+'</button>'+
+        '<button class="switch" role="switch" data-ail-on="'+esc(a.id)+'" aria-checked="'+(a.on?"true":"false")+'" aria-label="'+esc(a.name)+' seurannassa"><i></i></button>'+
+      '</div>'+panel;
+  }).join("") : '<div class="empty" style="padding:14px 10px">Et seuraa vielä yhtään vaivaa.</div>';
+}
+function renderAilAdd(show){
+  const p=$("#ailAddPanel");
+  p.hidden=!show; $("#ailAddBtn").hidden=show;
+  if(!show){ p.innerHTML=""; return; }
+  const have=getAils().map(a=>a.name.toLowerCase());
+  const sug=AIL_SUGGEST.filter(n=>have.indexOf(n.toLowerCase())<0);
+  p.innerHTML='<div class="editpanel">'+
+    (sug.length ? '<div class="xs muted" style="margin-bottom:7px">Yleisimmät</div><div class="chips">'+
+      sug.map(n=>'<button class="chip" data-ail-addname="'+esc(n)+'">+ '+esc(n)+'</button>').join("")+'</div>' : '')+
+    '<label class="field" style="margin-top:12px">Tai kirjoita oma<input type="text" id="ailNewName" maxlength="40" placeholder="esim. Akillesjänne" autocomplete="off"></label>'+
+    '<div class="row" style="margin-top:10px"><button class="btn primary" data-ail-addnew="1">Lisää</button>'+
+    '<button class="btn ghost" data-ail-addcancel="1">Peruuta</button></div></div>';
+}
+async function addAil(name){
+  name=String(name).trim(); if(!name) return;
+  const lc=name.toLowerCase();
+  if(getAils().some(a=>a.name.toLowerCase()===lc)){ toast(name+" on jo listalla"); return; }
+  /* Jos samanniminen vaiva on joskus poistettu, mutta sillä on historiaa,
+     käytetään samaa tunnistetta — vanha historia kytkeytyy takaisin. */
+  let id=null;
+  for(const s of mem.sessions){
+    const hit=Object.keys(s.ail||{}).find(k=>String(s.ail[k].n||"").toLowerCase()===lc);
+    if(hit){ id=hit; break; }
+  }
+  if(!id && lc==="polvi" && dataUsesPolvi()) id=POLVI_ID;
+  if(id && getAils().some(a=>a.id===id)) id=null;
+  if(!id) id=slugId(name);
+  const f = id===POLVI_ID ? Object.assign({}, POLVI_DEFAULT.f) : {after:false, stiff:false, swell:false, morning:false};
+  await saveAils(getAils().concat([{id:id, name:name, on:true, f:f}]));
+  renderAilAdd(false); renderAilSettings(); renderAilCard(); renderExos();
+  toast(name+" lisätty seurantaan");
+}
+async function delAil(id){
+  const a=getAils().find(x=>x.id===id); if(!a) return;
+  const n=mem.sessions.filter(s=>s.ail && entryHas(s.ail[id])).length;
+  const msg = n
+    ? a.name+": "+nkpl(n,"merkintä","merkintää")+" säilyy historiassa ja näkyy edelleen Vaivat-välilehdellä.\n\nPoistetaanko vaiva seurannasta?"
+    : "Poistetaanko "+a.name+" seurannasta?";
+  if(!confirm(msg)) return;
+  await saveAils(getAils().filter(x=>x.id!==id));
+  ailEditing=null; renderAilSettings(); renderAilCard(); renderExos();
+  toast(a.name+" poistettu seurannasta");
 }
 
 /* ============================================================
@@ -1282,7 +1591,9 @@ function buildExport(){
     app:"treenikirja", version:APP_VERSION, exportedAt:new Date().toISOString(),
     sessions: mem.sessions,
     dayLogs: mem.dayLogs,
-    customExercises: getCustom()
+    customExercises: getCustom(),
+    ailments: getAils(),
+    ailOnLog: ailOnLog()
   }, null, 2);
 }
 async function saveFile(name, text, mime){
@@ -1311,37 +1622,62 @@ async function exportJSON(){
     toast("Varmuuskopio tallennettu"); renderAll(); renderBackupInfo();
   }
 }
-function csvText(){
-  const q=v=>{ v=v==null?"":String(v); return /[",\n]/.test(v) ? '"'+v.replace(/"/g,'""')+'"' : v; };
-  const head=["paiva","tyyppi","liike_tai_aste","sarja","toistot","paino_kg","rpe","e1rm_kg","liike_polvi_oireili","kesto_min","polvi_kipu_aikana","polvi_kipu_jalkeen","polvi_jaykkyys","polvi_turvotus","polvi_note","aamujaykkyys","kehonpaino_kg","uni_h","palautuminen","muistiinpano"];
+function csvQ(v){ v=v==null?"":String(v); return /[",\n\r]/.test(v) ? '"'+v.replace(/"/g,'""')+'"' : v; }
+/* Treenit: yksi rivi per sarja (kiipeilyssä per vaikeusaste). "oireili" kertoo
+   mikä vaiva oireili kyseisessä liikkeessä. Vaivojen tarkemmat arvot ovat
+   omassa tiedostossaan, jotta sarakkeet eivät kasva vaivojen määrän mukana. */
+function csvTreenit(){
+  const head=["paiva","tyyppi","liike_tai_aste","sarja","toistot","paino_kg","rpe","e1rm_kg","oireili","kesto_min","kehonpaino_kg","uni_h","palautuminen","muistiinpano"];
   const out=[head.join(",")];
   const dmap=mapDays(mem.dayLogs);
   mem.sessions.slice().sort((a,b)=>a.date.localeCompare(b.date)).forEach(s=>{
-    const d=dmap[s.date]||{}, k=s.knee||{};
-    const tail=[s.dur||"", k.during==null?"":k.during, k.after==null?"":k.after, k.stiff?"1":"", k.swell?"1":"", k.note||"", d.morningStiff||"", d.bw||"", d.sleep||"", d.rec||"", s.note||""];
+    const d=dmap[s.date]||{};
+    const tail=[s.dur||"", d.bw||"", d.sleep||"", d.rec||"", s.note||""];
     if(s.type==="gym"){
       (s.exercises||[]).forEach(e=>e.sets.forEach((st,i)=>{
-        out.push([s.date,"sali",e.name,i+1,num(st.reps),num(st.weight),st.rpe||"",Math.round(e1rm(st.weight,st.reps)*10)/10, e.kneeFlag?"1":""].concat(tail).map(q).join(","));
+        out.push([s.date,"sali",e.name,i+1,num(st.reps),num(st.weight),st.rpe||"",Math.round(e1rm(st.weight,st.reps)*10)/10,
+          (e.flags||[]).map(id=>ailName(id)).join("; ")].concat(tail).map(csvQ).join(","));
       }));
     } else {
-      const sd=(s.climb&&s.climb.sends)||{}, keys=Object.keys(sd);
-      if(!keys.length) out.push([s.date,"kiipeily",STYLE_LABEL[s.climb&&s.climb.style]||"","","","","","",""].concat(tail).map(q).join(","));
-      keys.forEach(g=>{
-        out.push([s.date,"kiipeily",(STYLE_LABEL[s.climb&&s.climb.style]||"")+" "+g,"",sd[g],"","","",""].concat(tail).map(q).join(","));
-      });
+      const sd=(s.climb&&s.climb.sends)||{}, keys=Object.keys(sd), lab=STYLE_LABEL[s.climb&&s.climb.style]||"";
+      if(!keys.length) out.push([s.date,"kiipeily",lab,"","","","","",""].concat(tail).map(csvQ).join(","));
+      keys.forEach(g=>out.push([s.date,"kiipeily",lab+" "+g,"",sd[g],"","","",""].concat(tail).map(csvQ).join(",")));
     }
   });
   Object.keys(dmap).sort().forEach(kd=>{
-    if(!mem.sessions.some(s=>s.date===kd)){
-      const d=dmap[kd];
-      out.push([kd,"lepo","","","","","","","","","","","","","",d.morningStiff||"",d.bw||"",d.sleep||"",d.rec||"",""].map(q).join(","));
-    }
+    if(mem.sessions.some(s=>s.date===kd)) return;
+    const d=dmap[kd];
+    if(!(d.bw||d.sleep||d.rec)) return;
+    out.push([kd,"lepo","","","","","","","","",d.bw||"",d.sleep||"",d.rec||"",""].map(csvQ).join(","));
   });
   return out.join("\n");
 }
+/* Vaivat: yksi rivi per havainto. lahde = treeni (treenin vaivamerkintä),
+   liike (liike merkitty oireilevaksi) tai aamu (aamujäykkyys). Kyllä/ei-arvot 1/0. */
+function csvVaivat(){
+  const head=["paiva","vaiva","lahde","treeni_tyyppi","liike","kipu_aikana","kipu_jalkeen","jaykkyys","turvotus","aamujaykkyys","muistiinpano"];
+  const rows=[];
+  mem.sessions.forEach(s=>{
+    const tt=s.type==="gym"?"sali":"kiipeily";
+    ailIds(s).forEach(id=>{ const en=s.ail[id];
+      rows.push([s.date, ailName(id,en), "treeni", tt, "", en.pain==null?"":en.pain, en.after==null?"":en.after, en.stiff?1:0, en.swell?1:0, "", en.note||""]); });
+    (s.exercises||[]).forEach(e=>(e.flags||[]).forEach(id=>{
+      rows.push([s.date, ailName(id), "liike", tt, e.name, "", "", "", "", "", ""]); }));
+  });
+  mem.dayLogs.forEach(d=>{ const m=d.morning||{};
+    Object.keys(m).forEach(id=>{ if(m[id]!=null) rows.push([d.date, ailName(id), "aamu", "", "", "", "", "", "", m[id], ""]); }); });
+  const ord=["aamu","treeni","liike"];
+  rows.sort((a,b)=> a[0].localeCompare(b[0]) || String(a[1]).localeCompare(String(b[1]),"fi") || ord.indexOf(a[2])-ord.indexOf(b[2]));
+  return [head.join(",")].concat(rows.map(r=>r.map(csvQ).join(","))).join("\n");
+}
 async function exportCsv(){
   if(!mem.sessions.length){ toast("Ei vielä omaa dataa vietäväksi"); return; }
-  await saveFile("treenikirja-"+todayStr()+".csv", "﻿"+csvText(), "text/csv");
+  await saveFile("treenikirja-treenit-"+todayStr()+".csv", "\ufeff"+csvTreenit(), "text/csv");
+}
+async function exportCsvAil(){
+  const t=csvVaivat();
+  if(t.indexOf("\n")<0){ toast("Ei vielä vaivamerkintöjä vietäväksi"); return; }
+  await saveFile("treenikirja-vaivat-"+todayStr()+".csv", "\ufeff"+t, "text/csv");
 }
 async function importJSON(file){
   let data;
@@ -1355,14 +1691,26 @@ async function importJSON(file){
   );
   try{
     if(replace) await clearAll();
-    for(const s of data.sessions) await put("sessions", s);
-    for(const d of (data.dayLogs||[])) if(d && d.date) await put("dayLogs", d);
+    /* Vanhan version (v1) varmuuskopio muunnetaan samalla tavalla kuin ladattaessa. */
+    for(const s of data.sessions) await put("sessions", normSession(s));
+    for(const d of (data.dayLogs||[])) if(d && d.date) await put("dayLogs", normDay(d));
     if(Array.isArray(data.customExercises)){
       const merged = replace ? data.customExercises : Array.from(new Set(getCustom().concat(data.customExercises)));
       await setMeta("customExercises", merged);
     }
+    if(Array.isArray(data.ailments)){
+      if(replace) await saveAils(data.ailments);
+      else { const ids=new Set(getAils().map(a=>a.id)); await saveAils(getAils().concat(data.ailments.filter(a=>a && a.id && !ids.has(a.id)))); }
+      if(replace && typeof data.ailOnLog==="boolean") await setMeta("ailOnLog", data.ailOnLog);
+    }
     await loadAll();
-    editingId=null; draft=blankDraft(); syncForm();
+    if(!Array.isArray(data.ailments)){
+      /* v1-varmuuskopiossa ei ole vaiva-asetuksia: polvidata tarvitsee Polvi-vaivan. */
+      await ensureAilConfig();
+      if(dataUsesPolvi() && !getAils().some(a=>a.id===POLVI_ID))
+        await saveAils(getAils().concat([Object.assign({}, POLVI_DEFAULT, {f:Object.assign({}, POLVI_DEFAULT.f)})]));
+    }
+    editingId=null; draft=blankDraft(); ailOpen={}; flagPicker=null; syncForm();
     toast("Tuotu: "+data.sessions.length+" treeniä");
     go("log");
   }catch(e){ toast("Tuonti epäonnistui"); }
@@ -1423,8 +1771,8 @@ async function requestPersist(){
 async function wipeAll(){
   if(!confirm("Poistetaanko KAIKKI treenidata tästä laitteesta? Tätä ei voi perua.")) return;
   if(!confirm("Vahvista vielä: kaikki treenit, päiväkirjamerkinnät ja omat liikkeet poistetaan.")) return;
-  await clearAll(); await loadAll();
-  editingId=null; draft=blankDraft(); DEMO=null; syncForm();
+  await clearAll(); await loadAll(); await ensureAilConfig();
+  editingId=null; draft=blankDraft(); DEMO=null; ailSel=null; ailOpen={}; flagPicker=null; syncForm();
   toast("Kaikki data poistettu"); go("log");
 }
 
@@ -1437,16 +1785,17 @@ function go(v){
   $$(".view").forEach(s=>s.classList.toggle("on", s.id==="v-"+v));
   $$("#tabs button").forEach(b=>b.setAttribute("aria-current", String(b.dataset.view===v)));
   renderAll();
-  if(v==="data"){ renderBackupInfo(); refreshStorageInfo(); }
+  if(v==="data"){ renderBackupInfo(); refreshStorageInfo(); renderAilAdd(false); ailEditing=null; renderAilSettings(); }
   window.scrollTo({top:0});
 }
 function renderAll(){
   renderRecent();
   $("#logBanner").innerHTML = backupNudge();
-  if(current==="log") renderExos();
+  if(current==="log"){ renderExos(); renderAilCard(); }
   if(current==="cal") renderCal();
   if(current==="prog") renderProg();
-  if(current==="knee") renderKnee();
+  if(current==="ail") renderAil();
+  if(current==="data") renderAilSettings();
 }
 
 /* ============================================================
@@ -1463,14 +1812,33 @@ $("#cStyle").addEventListener("click", e=>{
   draft.climb.style = draft.climb.style===b.dataset.v ? "" : b.dataset.v;
   syncForm();
 });
-$("#fKneeFlags").addEventListener("click", e=>{
-  const b=e.target.closest("button"); if(!b) return;
-  draft.knee[b.dataset.v] = !draft.knee[b.dataset.v];
-  draft.kneeTouched = true;
-  syncForm();
+$("#fDur").addEventListener("change", e=>{
+  const v=e.target.value, muu=v==="muu";
+  draft.durMuu=muu;
+  $("#durOtherWrap").hidden=!muu;
+  draft.dur = muu ? $("#fDurOther").value : v;
+  if(muu) setTimeout(()=>$("#fDurOther").focus(), 30);
 });
-$("#fKDuring").addEventListener("input", e=>{ draft.knee.during=e.target.value; draft.kneeTouched=true; $("#kDuringOut").textContent=e.target.value; });
-$("#fKAfter").addEventListener("input", e=>{ draft.knee.after=e.target.value; draft.kneeTouched=true; $("#kAfterOut").textContent=e.target.value; });
+$("#fDurOther").addEventListener("input", e=>{ draft.dur=e.target.value; });
+/* Kentät talteen heti kirjoitettaessa, jotta lajin vaihto ei pyyhi niitä. */
+[["fNote","note"],["fBw","bw"],["fSleep","sleep"],["fRec","rec"]].forEach(([el,k])=>{
+  $("#"+el).addEventListener(el==="fRec"?"change":"input", e=>{ draft[k]=e.target.value; });
+});
+
+/* --- vaivakortti --- */
+function draftAil(id){ return draft.ail[id] || (draft.ail[id]={pain:null, after:null, stiff:false, swell:false, note:""}); }
+$("#ailCard").addEventListener("click", e=>{
+  const b=e.target.closest("[data-ail-set]");
+  if(b){ const p=b.dataset.ailSet.split(":"), en=draftAil(p[1]), v=+p[2];
+    en[p[0]] = en[p[0]]===v ? null : v; renderAilCard(); return; }
+  const x=e.target.closest("[data-ail-x]");
+  if(x){ const p=x.dataset.ailX.split(":"), en=draftAil(p[1]); en[p[0]]=!en[p[0]]; renderAilCard(); return; }
+  const o=e.target.closest("[data-ail-open]");
+  if(o){ const id=o.dataset.ailOpen; ailOpen[id]=!ailOpen[id]; renderAilCard(); return; }
+});
+$("#ailCard").addEventListener("input", e=>{
+  const t=e.target.closest("[data-ail-note]"); if(t) draftAil(t.dataset.ailNote).note=t.value;
+});
 
 const grades=$("#cGrades");
 let pressT=null;
@@ -1496,17 +1864,34 @@ $("#exos").addEventListener("click", e=>{
   const rep=e.target.closest("[data-repeat]");
   if(rep){
     const src=mem.sessions.find(x=>x.id===rep.dataset.repeat);
-    if(src){ draft.exercises=src.exercises.map(x=>({name:x.name, kneeFlag:false, sets:x.sets.map(st=>({reps:st.reps, weight:st.weight, rpe:""}))})); renderExos(); }
+    if(src){ draft.exercises=src.exercises.map(x=>({name:x.name, flags:[], sets:x.sets.map(st=>({reps:st.reps, weight:st.weight, rpe:""}))})); flagPicker=null; renderExos(); }
     return;
   }
-  const kf=e.target.closest("[data-knee-ex]");
-  if(kf){ const i=+kf.dataset.kneeEx; draft.exercises[i].kneeFlag=!draft.exercises[i].kneeFlag; renderExos(); return; }
+  const fx=e.target.closest("[data-flag-ex]");
+  if(fx){
+    const i=+fx.dataset.flagEx, act=activeAils(), ex=draft.exercises[i];
+    if(!ex.flags) ex.flags=[];
+    if(act.length===1){
+      const id=act[0].id, k=ex.flags.indexOf(id);
+      if(k>=0) ex.flags.splice(k,1); else ex.flags.push(id);
+      flagPicker=null;
+    } else flagPicker = flagPicker===i ? null : i;
+    renderExos(); return;
+  }
+  const fp=e.target.closest("[data-flag-pick]");
+  if(fp){
+    const p=fp.dataset.flagPick.split(":"), ex=draft.exercises[+p[0]];
+    if(!ex.flags) ex.flags=[];
+    const k=ex.flags.indexOf(p[1]);
+    if(k>=0) ex.flags.splice(k,1); else ex.flags.push(p[1]);
+    renderExos(); return;
+  }
   const add=e.target.closest("[data-add-set]"), dx=e.target.closest("[data-del-ex]"), ds=e.target.closest("[data-del-set]");
   if(add){ const i=+add.dataset.addSet, sets=draft.exercises[i].sets, l=sets[sets.length-1]||{reps:"",weight:"",rpe:""};
     sets.push({reps:l.reps, weight:l.weight, rpe:l.rpe}); renderExos(); return; }
-  if(dx){ draft.exercises.splice(+dx.dataset.delEx,1); renderExos(); return; }
+  if(dx){ draft.exercises.splice(+dx.dataset.delEx,1); flagPicker=null; renderExos(); return; }
   if(ds){ const p=ds.dataset.delSet.split(":"), sets=draft.exercises[+p[0]].sets;
-    if(sets.length>1) sets.splice(+p[1],1); else draft.exercises.splice(+p[0],1);
+    if(sets.length>1) sets.splice(+p[1],1); else { draft.exercises.splice(+p[0],1); flagPicker=null; }
     renderExos(); return; }
 });
 $("#exos").addEventListener("input", e=>{
@@ -1523,7 +1908,7 @@ $("#exList").addEventListener("click", e=>{ const b=e.target.closest("[data-pick
 document.addEventListener("keydown", e=>{ if(e.key==="Escape") closeSheet(); });
 
 $("#save").addEventListener("click", save);
-$("#reset").addEventListener("click", ()=>{ editingId=null; draft=blankDraft(); syncForm(); toast("Tyhjennetty"); });
+$("#reset").addEventListener("click", ()=>{ editingId=null; draft=blankDraft(); ailOpen={}; flagPicker=null; syncForm(); toast("Tyhjennetty"); });
 $("#fDate").addEventListener("change", e=>{
   draft.date=e.target.value;
   if(!editingId){
@@ -1533,7 +1918,44 @@ $("#fDate").addEventListener("change", e=>{
   }
 });
 
-$("#mStiffChips").addEventListener("click", e=>{ const b=e.target.closest("button"); if(b) setMorningStiff(b.dataset.v); });
+$("#v-ail").addEventListener("click", e=>{
+  const t=e.target.closest("[data-ail-tab]"); if(t){ ailSel=t.dataset.ailTab; renderAil(); return; }
+  const m=e.target.closest("[data-morning]"); if(m){ const p=m.dataset.morning.split(":"); setMorning(p[0], p[1]); }
+});
+
+/* --- asetukset: vaivaseuranta --- */
+$("#ailMaster").addEventListener("click", async ()=>{
+  await setMeta("ailOnLog", !ailOnLog());
+  flagPicker=null; renderAilSettings(); renderAilCard(); renderExos();
+  toast(ailOnLog() ? "Vaivaseuranta näkyy kirjauksessa" : "Vaivaseuranta piilotettu kirjauksesta");
+});
+$("#ailAddBtn").addEventListener("click", ()=>{ renderAilAdd(true); });
+$("#ailAddPanel").addEventListener("click", e=>{
+  const n=e.target.closest("[data-ail-addname]"); if(n){ addAil(n.dataset.ailAddname); return; }
+  if(e.target.closest("[data-ail-addnew]")){ const v=($("#ailNewName")||{}).value||""; if(v.trim()) addAil(v); else toast("Kirjoita vaivan nimi"); return; }
+  if(e.target.closest("[data-ail-addcancel]")) renderAilAdd(false);
+});
+$("#ailAddPanel").addEventListener("keydown", e=>{
+  if(e.key==="Enter" && e.target.id==="ailNewName"){ e.preventDefault(); if(e.target.value.trim()) addAil(e.target.value); }
+});
+$("#ailCfgList").addEventListener("click", async e=>{
+  const sw=e.target.closest("[data-ail-on]");
+  if(sw){ await updAil(sw.dataset.ailOn, a=>{ a.on=!a.on; }); flagPicker=null; renderAilSettings(); renderAilCard(); renderExos(); return; }
+  const ed=e.target.closest("[data-ail-edit]");
+  if(ed){ ailEditing = ailEditing===ed.dataset.ailEdit ? null : ed.dataset.ailEdit; renderAilSettings(); return; }
+  if(e.target.closest("[data-ail-done]")){ ailEditing=null; renderAilSettings(); renderAilCard(); renderExos(); return; }
+  const dl=e.target.closest("[data-ail-del]"); if(dl){ delAil(dl.dataset.ailDel); }
+});
+$("#ailCfgList").addEventListener("change", async e=>{
+  const c=e.target.closest("[data-ail-field]"); if(!c) return;
+  const p=c.dataset.ailField.split(":");
+  await updAil(p[1], a=>{ a.f[p[0]]=c.checked; });
+  renderAilSettings(); renderAilCard();
+});
+$("#ailCfgList").addEventListener("input", e=>{
+  const r=e.target.closest("[data-ail-rename]"); if(!r) return;
+  const v=r.value.trim(); if(v) updAil(r.dataset.ailRename, a=>{ a.name=v; });
+});
 
 document.addEventListener("click", async e=>{
   const ed=e.target.closest("[data-edit]"); if(ed){ loadForEdit(ed.dataset.edit); return; }
@@ -1548,6 +1970,7 @@ $("#exSel").addEventListener("change", e=>drawExChart(view(), e.target.value));
 
 $("#expJson").addEventListener("click", exportJSON);
 $("#expCsv").addEventListener("click", exportCsv);
+$("#expCsvAil").addEventListener("click", exportCsvAil);
 $("#impJson").addEventListener("change", e=>{ const f=e.target.files[0]; if(f) importJSON(f); e.target.value=""; });
 $("#reqPersist").addEventListener("click", requestPersist);
 $("#wipe").addEventListener("click", wipeAll);
@@ -1566,12 +1989,13 @@ async function boot(){
   catch(e){ USE_LS=true; }
   try{ await loadAll(); }
   catch(e){ USE_LS=true; try{ await loadAll(); }catch(e2){} }
+  try{ await ensureAilConfig(); }catch(e){}
 
   if(USE_LS) setStatus("Varajärjestelmä käytössä (localStorage) — vie JSON-varmuuskopio usein", "warn");
   else setStatus("Data tallessa tässä laitteessa (IndexedDB)");
 
   syncForm();
-  renderCal(); renderProg(); renderKnee(); renderRecent();
+  renderCal(); renderProg(); renderAil(); renderRecent();
   renderAll();
 
   try{
